@@ -10,7 +10,10 @@ def ScaleImage(im, x, y):
 		return im
 
 def ForceRGB(im):
-	assert (im.mode == "RGB"), "Unknown mode {}".format(im.mode)
+	if im.mode != "RGB":
+		print("Converting from {} to RGB".format(im.mode))
+		im = im.convert("RGB")
+
 	return im
 
 def ConvertToPix(im):
