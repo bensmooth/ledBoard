@@ -52,9 +52,6 @@ def main(argv):
 
 	imageData = LoadImage(argv[1])
 
-	print("imageData = '{}' of '{}'".format(type(imageData), type(imageData[0])))
-	print([binascii.hexlify(bytearray(x)) for x in imageData])
-
 	DrawImage(screen, imageData)
 
 	pygame.display.flip()
