@@ -1,8 +1,6 @@
 DISPLAY_WIDTH = 18
 DISPLAY_HEIGHT = 18
 TOTAL_PIXELS = DISPLAY_WIDTH * DISPLAY_HEIGHT
-PIXEL_SIZE = 40
-BORDER_SIZE = 4
 
 # Converts a set of coordinates into an index.
 def CoordinatesToIndex(x, y):
