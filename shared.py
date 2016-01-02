@@ -22,7 +22,7 @@ def CoordinatesToIndex(x, y):
 def IndexToCoordinates(position):
 	assert (0 <= position < TOTAL_PIXELS), "Index is out of range with value {}".format(position)
 	x = position % DISPLAY_WIDTH
-	y = position / DISPLAY_WIDTH
+	y = position // DISPLAY_WIDTH
 
 	if (y % 2 == 1):
 		# Odd rows go backwards
