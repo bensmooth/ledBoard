@@ -44,6 +44,14 @@ def DrawImage(surface, imageData):
 	for index, pixel in enumerate(imageData):
 		DrawPixelAtIndex(surface, pixel, index)
 
+def SetPixelAtScreenCoordinates(x, y):
+	return ""
+
+def Loop(screen, imageData):
+	screen.fill((0, 0, 0))
+	DrawImage(screen, imageData)
+	pygame.display.flip()
+
 def main(argv):
 	assert (len(argv) == 2), "Usage: {} <image filename>".format(argv[0])
 	pygame.init()
@@ -51,13 +59,7 @@ def main(argv):
 	windowSize = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE)
 	screen = pygame.display.set_mode(windowSize)
 
-	screen.fill((0, 0, 0))
-
 	imageData = LoadImage(argv[1])
-
-	DrawImage(screen, imageData)
-
-	pygame.display.flip()
 
 	while 1:
 		for event in pygame.event.get():
@@ -66,6 +68,10 @@ def main(argv):
 					sys.exit()
 			if event.type == pygame.QUIT:
 				sys.exit()
+			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+				SetPixelAtScreenCoordinates(0, 0)
+
+		Loop(screen, imageData)
 
 if __name__ == '__main__':
 	main(sys.argv)
