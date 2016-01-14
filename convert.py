@@ -16,7 +16,7 @@ def ForceRGB(im):
 
 	return im
 
-def ConvertToPix(im):
+def ConvertDataToPix(im):
 	im = ForceRGB(im)
 	pixData = bytearray()
 
@@ -33,23 +33,27 @@ def ConvertToPix(im):
 
 	return pixData
 
+def ConvertToPix(imageFilename, outputFilename):
+        im = Image.open(imageFilename)
+
+        # Scale image if it is too small or big
+        im = ScaleImage(im, DISPLAY_WIDTH, DISPLAY_HEIGHT)
+
+        pixData = ConvertDataToPix(im)
+
+        outfile = open(outputFilename, "wb")
+        try:
+                outfile.write(pixData)
+        finally:
+                outfile.close()
+
 def main(argv):
-	assert (len(argv) == 2), "Usage: {} <image to convert>".format(argv[0])
+	assert (len(argv) > 1), "Usage: {} <image1> <image2> ... <imageN>".format(argv[0])
 
-	inputFilename = argv[1]
-	im = Image.open(inputFilename)
-
-	# Scale image if it is too small or big
-	im = ScaleImage(im, DISPLAY_WIDTH, DISPLAY_HEIGHT)
-
-	pixData = ConvertToPix(im)
-
-	outfile = open(inputFilename + ".pix", "wb")
-	try:
-		outfile.write(pixData)
-	finally:
-		outfile.close()
-
+	for imageFilename in argv[1:]:
+		outputFilename = os.path.splitext(imageFilename)[0] + ".pix"
+		print("Converting to " + outputFilename)
+		ConvertToPix(imageFilename, outputFilename)
 
 if __name__ == '__main__':
 	main(sys.argv)
