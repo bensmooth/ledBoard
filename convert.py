@@ -18,7 +18,7 @@ def ForceRGB(im):
 
 def ConvertDataToPix(im):
 	im = ForceRGB(im)
-	pixData = bytearray()
+	pixData = []
 
 	r, g, b = im.split()
 	for i in range(TOTAL_PIXELS):
@@ -26,34 +26,62 @@ def ConvertDataToPix(im):
 		rVal = r.getpixel(coords)
 		gVal = g.getpixel(coords)
 		bVal = b.getpixel(coords)
-		# Intentionally changing order of b and g, to match hardware.
-		pixData.append(rVal)
-		pixData.append(bVal)
-		pixData.append(gVal)
+
+		pixData.append(FormatPixel(rVal, gVal, bVal, coords))
 
 	return pixData
 
-def ConvertToPix(imageFilename, outputFilename):
-        im = Image.open(imageFilename)
 
-        # Scale image if it is too small or big
-        im = ScaleImage(im, DISPLAY_WIDTH, DISPLAY_HEIGHT)
+def WritePixData(outputFilename, pixData):
+	pixDataArray = bytearray()
+	for pixelTriplet in pixData:
+		for component in pixelTriplet:
+			pixDataArray.append(component)
 
-        pixData = ConvertDataToPix(im)
+	outfile = open(outputFilename, "wb")
+	try:
+		outfile.write(pixDataArray)
+	finally:
+		outfile.close()
 
-        outfile = open(outputFilename, "wb")
-        try:
-                outfile.write(pixData)
-        finally:
-                outfile.close()
+
+def ConvertToPix(imageFilename):
+	im = Image.open(imageFilename)
+
+	# Scale image if it is too small or big
+	im = ScaleImage(im, DISPLAY_WIDTH, DISPLAY_HEIGHT)
+	pixData = ConvertDataToPix(im)
+	return pixData
+
+
+def FixRGBInPixFile(filename):
+	imageData = LoadPixImage(filename)
+
+	# Hitting everything with FormatPixel() should fix everything.
+	for i in range(TOTAL_PIXELS):
+		coords = IndexToCoordinates(i)
+		currentPixel = imageData[i]
+		imageData[i] = FormatPixel(currentPixel[0], currentPixel[2], currentPixel[1], coords)
+
+	return imageData
+
 
 def main(argv):
 	assert (len(argv) > 1), "Usage: {} <image1> <image2> ... <imageN>".format(argv[0])
 
 	for imageFilename in argv[1:]:
-		outputFilename = os.path.splitext(imageFilename)[0] + ".pix"
-		print("Converting to " + outputFilename)
-		ConvertToPix(imageFilename, outputFilename)
+		if imageFilename.endswith(".pix"):
+			# We are just fixing the RGB order.
+			print("Finagling RGB orders in " + imageFilename)
+			outputFilename = imageFilename
+			pixData = FixRGBInPixFile(imageFilename)
+		else:
+			outputFilename = os.path.splitext(imageFilename)[0] + ".pix"
+			print("Converting to " + outputFilename)
+			pixData = ConvertToPix(imageFilename)
+
+		WritePixData(outputFilename, pixData)
+
 
 if __name__ == '__main__':
 	main(sys.argv)

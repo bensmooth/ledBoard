@@ -24,28 +24,13 @@ def DrawPixelAtIndex(surface, color, index):
 	coords = IndexToCoordinates(index)
 	DrawPixel(surface, color, coords[0], coords[1])
 
-def LoadImage(filename):
-	f = open(filename, "rb")
-
-	try:
-		# Suck entire file in.
-		fileContents = bytearray(f.read())
-		fileContentsLength = len(fileContents)
-		assert (fileContentsLength % 3 == 0), "Length of file ({}) must be a multiple of 3!".format(fileContentsLength)
-
-		# Split into RBG tuples.
-		data = [fileContents[i:i+3] for i in range(0, fileContentsLength, 3)]
-
-		return data
-	finally:
-		f.close()
-
 def DrawImage(surface, imageData):
 	for index, pixel in enumerate(imageData):
 		DrawPixelAtIndex(surface, pixel, index)
 
-def SetPixelAtScreenCoordinates(x, y):
-	return ""
+def GetPixelAtScreenCoordinates(x, y):
+	# TODO: ?
+	return (0, 0)
 
 def Loop(screen, imageData):
 	screen.fill((0, 0, 0))
@@ -59,7 +44,8 @@ def main(argv):
 	windowSize = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE)
 	screen = pygame.display.set_mode(windowSize)
 
-	imageData = LoadImage(argv[1])
+	imageData = LoadPixImage(argv[1])
+	brushColor = (0, 0, 0)
 
 	while 1:
 		for event in pygame.event.get():
@@ -69,9 +55,11 @@ def main(argv):
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-				SetPixelAtScreenCoordinates(0, 0)
+				pixelToColor = GetPixelAtScreenCoordinates(0, 0)
+				
 
 		Loop(screen, imageData)
+
 
 if __name__ == '__main__':
 	main(sys.argv)
