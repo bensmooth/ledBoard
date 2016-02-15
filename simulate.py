@@ -28,9 +28,15 @@ def DrawImage(surface, imageData):
 	for index, pixel in enumerate(imageData):
 		DrawPixelAtIndex(surface, pixel, index)
 
-def GetPixelAtScreenCoordinates(x, y):
-	# TODO: ?
-	return (0, 0)
+def GetPixelAtScreenCoordinates(xy):
+	xCoord = xy[0] / (PIXEL_SIZE + BORDER_SIZE)
+	yCoord = xy[1] / (PIXEL_SIZE + BORDER_SIZE) 
+	return (xCoord, yCoord)
+
+def ColorPixelAtScreenCoordinates(imageData, screenCoordinates, color):
+	pixelToColor = GetPixelAtScreenCoordinates(screenCoordinates)
+	modifiedPixelIndex = CoordinatesToIndex(pixelToColor[0], pixelToColor[1])
+	imageData[modifiedPixelIndex] = color
 
 def Loop(screen, imageData):
 	screen.fill((0, 0, 0))
@@ -40,25 +46,30 @@ def Loop(screen, imageData):
 def main(argv):
 	assert (len(argv) == 2), "Usage: {} <image filename>".format(argv[0])
 	pygame.init()
+	filename = argv[1]
 
 	windowSize = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE)
 	screen = pygame.display.set_mode(windowSize)
 
-	imageData = LoadPixImage(argv[1])
-	brushColor = (0, 0, 0)
+	imageData = LoadPixData(filename)
+	brushColor = bytearray((0, 0, 0))
+	clock = pygame.time.Clock()
 
 	while 1:
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_ESCAPE:
 					sys.exit()
+				elif event.key == pygame.K_s:
+					print("Saving to {}".format(filename))
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-				pixelToColor = GetPixelAtScreenCoordinates(0, 0)
-				
+				screenCoords = pygame.mouse.get_pos()
+				ColorPixelAtScreenCoordinates(imageData, screenCoords, brushColor)
 
 		Loop(screen, imageData)
+		clock.tick(30)
 
 
 if __name__ == '__main__':

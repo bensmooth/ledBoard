@@ -32,19 +32,6 @@ def ConvertDataToPix(im):
 	return pixData
 
 
-def WritePixData(outputFilename, pixData):
-	pixDataArray = bytearray()
-	for pixelTriplet in pixData:
-		for component in pixelTriplet:
-			pixDataArray.append(component)
-
-	outfile = open(outputFilename, "wb")
-	try:
-		outfile.write(pixDataArray)
-	finally:
-		outfile.close()
-
-
 def ConvertToPix(imageFilename):
 	im = Image.open(imageFilename)
 
@@ -55,7 +42,7 @@ def ConvertToPix(imageFilename):
 
 
 def FixRGBInPixFile(filename):
-	imageData = LoadPixImage(filename)
+	imageData = LoadPixData(filename)
 
 	# Hitting everything with FormatPixel() should fix everything.
 	for i in range(TOTAL_PIXELS):

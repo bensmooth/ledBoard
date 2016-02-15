@@ -4,8 +4,10 @@ TOTAL_PIXELS = DISPLAY_WIDTH * DISPLAY_HEIGHT
 
 # Converts a set of coordinates into an index.
 def CoordinatesToIndex(x, y):
-	index = y * DISPLAY_WIDTH
+	assert (0 <= x < DISPLAY_WIDTH), "x is out of range with value {}".format(x)
+	assert (0 <= y < DISPLAY_HEIGHT), "y is out of range with value {}".format(y)
 
+	index = y * DISPLAY_WIDTH
 	if (y % 2 == 0):
 		index = index + x
 	else:
@@ -30,6 +32,7 @@ def IndexToCoordinates(position):
 
 	return (x, y)
 
+
 # Given an RGB tuple and coordinates, converts the RGB tuple into an RBG tuple if necessary.
 def FormatPixel(r, g, b, coordinates):
 	# The hardware requires us to use RGB instead of RBG for the last row.
@@ -40,7 +43,7 @@ def FormatPixel(r, g, b, coordinates):
 
 
 # Loads a PIX image file into memory as an array of RGB triplets.
-def LoadPixImage(filename):
+def LoadPixData(filename):
 	f = open(filename, "rb")
 
 	try:
@@ -55,3 +58,16 @@ def LoadPixImage(filename):
 		return data
 	finally:
 		f.close()
+
+
+def WritePixData(outputFilename, pixData):
+	pixDataArray = bytearray()
+	for pixelTriplet in pixData:
+		for component in pixelTriplet:
+			pixDataArray.append(component)
+
+	outfile = open(outputFilename, "wb")
+	try:
+		outfile.write(pixDataArray)
+	finally:
+		outfile.close()
