@@ -11,7 +11,7 @@ def CoordinatesToIndex(x, y):
 	if (y % 2 == 0):
 		index = index + x
 	else:
-		index = index + DISPLAY_WIDTH - x
+		index = index + DISPLAY_WIDTH - 1 - x
 
 	return index
 
