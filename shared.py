@@ -34,13 +34,12 @@ def IndexToCoordinates(position):
 
 
 # Given an RGB tuple and coordinates, converts the RGB tuple into an RBG tuple if necessary.
-def FormatPixel(r, g, b, coordinates):
+def FormatPixel(rgb, coordinates):
 	# The hardware requires us to use RGB instead of RBG for the last row.
 	if coordinates[1] == (DISPLAY_HEIGHT - 1):
-		return (r, g, b)
+		return (rgb[0], rgb[1], rgb[2])
 	else:
-		return (r, b, g)
-
+		return (rgb[0], rgb[2], rgb[1])
 
 # Loads a PIX image file into memory as an array of RGB triplets.
 def LoadPixData(filename):

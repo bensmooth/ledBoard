@@ -27,7 +27,8 @@ def ConvertDataToPix(im):
 		gVal = g.getpixel(coords)
 		bVal = b.getpixel(coords)
 
-		pixData.append(FormatPixel(rVal, gVal, bVal, coords))
+		formattedPixel = FormatPixel((rVal, gVal, bVal), coords)
+		pixData.append(formattedPixel)
 
 	return pixData
 

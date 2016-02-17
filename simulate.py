@@ -11,9 +11,7 @@ def DrawPixel(surface, color, x, y):
 	assert (0 <= y < DISPLAY_HEIGHT), "Position Y is out of bounds with value {}!".format(y)
 
 	# The hardware switches the green and blue channels, so we need to swap the green and blue values.
-	massagedColor = copy.deepcopy(color)
-	massagedColor[1] = color[2]
-	massagedColor[2] = color[1]
+	massagedColor = FormatPixel(color, (x, y))
 
 	cornerX = (PIXEL_SIZE + BORDER_SIZE) * x
 	cornerY = (PIXEL_SIZE + BORDER_SIZE) * y
@@ -36,7 +34,7 @@ def GetPixelAtScreenCoordinates(xy):
 def ColorPixelAtScreenCoordinates(imageData, screenCoordinates, color):
 	pixelToColor = GetPixelAtScreenCoordinates(screenCoordinates)
 	modifiedPixelIndex = CoordinatesToIndex(pixelToColor[0], pixelToColor[1])
-	imageData[modifiedPixelIndex] = color
+	imageData[modifiedPixelIndex] = FormatPixel(color, pixelToColor)
 
 def Loop(screen, imageData):
 	screen.fill((0, 0, 0))
