@@ -62,11 +62,11 @@ def main(argv):
 					sys.exit()
 				elif event.key == pygame.K_s:
 					print("Saving to {}".format(filename))
+					# TODO: Actually save it.
 			if event.type == pygame.QUIT:
 				sys.exit()
-			if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-				screenCoords = pygame.mouse.get_pos()
-				ColorPixelAtScreenCoordinates(imageData, screenCoords, brushColor)
+			if (event.type == pygame.MOUSEMOTION and event.buttons[0] == 1) or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+				ColorPixelAtScreenCoordinates(imageData, event.pos, brushColor)
 
 		Loop(screen, imageData)
 		clock.tick(30)
