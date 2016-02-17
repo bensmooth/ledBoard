@@ -60,7 +60,7 @@ def main(argv):
 					sys.exit()
 				elif event.key == pygame.K_s:
 					print("Saving to {}".format(filename))
-					# TODO: Actually save it.
+					WritePixData(filename, imageData)
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if (event.type == pygame.MOUSEMOTION and event.buttons[0] == 1) or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
