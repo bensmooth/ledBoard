@@ -4,7 +4,7 @@ from shared import *
 
 PIXEL_SIZE = 40
 BORDER_SIZE = 4
-
+COLOR_PICKER_HEIGHT = 40
 
 def DrawPixel(surface, color, x, y):
 	assert (0 <= x < DISPLAY_WIDTH), "Position X is out of bounds with value {}!".format(x)
@@ -36,17 +36,25 @@ def ColorPixelAtScreenCoordinates(imageData, screenCoordinates, color):
 	modifiedPixelIndex = CoordinatesToIndex(pixelToColor[0], pixelToColor[1])
 	imageData[modifiedPixelIndex] = FormatPixel(color, pixelToColor)
 
-def Loop(screen, imageData):
-	screen.fill((0, 0, 0))
+def Loop(screen, imageData, brushColor, fontRenderer, windowSize):
+	backgroundColor = pygame.Color(0, 0, 0)
+	screen.fill(backgroundColor)
+
+	colorText = "({}, {}, {})".format(*brushColor)
+	colorTextSurface = fontRenderer.render(colorText, True, (230, 230, 230), backgroundColor)
+	screen.blit(colorTextSurface, (0, windowSize[1] - colorTextSurface.get_height()))
+
 	DrawImage(screen, imageData)
+
 	pygame.display.flip()
 
 def main(argv):
 	assert (len(argv) == 2), "Usage: {} <image filename>".format(argv[0])
 	pygame.init()
 	filename = argv[1]
+	fontRenderer = pygame.font.SysFont("monospace", 42)
 
-	windowSize = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE)
+	windowSize = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE) + COLOR_PICKER_HEIGHT
 	screen = pygame.display.set_mode(windowSize)
 
 	imageData = LoadPixData(filename)
@@ -66,7 +74,8 @@ def main(argv):
 			if (event.type == pygame.MOUSEMOTION and event.buttons[0] == 1) or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
 				ColorPixelAtScreenCoordinates(imageData, event.pos, brushColor)
 
-		Loop(screen, imageData)
+		Loop(screen, imageData, brushColor, fontRenderer, windowSize)
+
 		clock.tick(30)
 
 
