@@ -18,14 +18,6 @@ def DrawPixel(surface, color, x, y):
 	area = cornerX, cornerY, PIXEL_SIZE, PIXEL_SIZE
 	pygame.draw.rect(surface, massagedColor, area)
 
-def DrawPixelAtIndex(surface, color, index):
-	coords = IndexToCoordinates(index)
-	DrawPixel(surface, color, coords[0], coords[1])
-
-def DrawImage(surface, imageData):
-	for index, pixel in enumerate(imageData):
-		DrawPixelAtIndex(surface, pixel, index)
-
 def GetPixelAtScreenCoordinates(xy):
 	xCoord = xy[0] / (PIXEL_SIZE + BORDER_SIZE)
 	yCoord = xy[1] / (PIXEL_SIZE + BORDER_SIZE) 
@@ -36,45 +28,58 @@ def ColorPixelAtScreenCoordinates(imageData, screenCoordinates, color):
 	modifiedPixelIndex = CoordinatesToIndex(pixelToColor[0], pixelToColor[1])
 	imageData[modifiedPixelIndex] = FormatPixel(color, pixelToColor)
 
-def Loop(screen, imageData, brushColor, fontRenderer, windowSize):
-	backgroundColor = pygame.Color(0, 0, 0)
-	screen.fill(backgroundColor)
+class DrawingScene:
+	def __init__(self, backgroundColor, initialBrushColor):
+		self.fontRenderer = pygame.font.SysFont("monospace", 42)
+		self.backgroundColor = backgroundColor
+		self.brushColor = initialBrushColor
 
-	colorText = "({}, {}, {})".format(*brushColor)
-	colorTextSurface = fontRenderer.render(colorText, True, (230, 230, 230), backgroundColor)
-	screen.blit(colorTextSurface, (0, windowSize[1] - colorTextSurface.get_height()))
+	def OnLoop(self, screen, imageData):
+		screen.fill(self.backgroundColor)
 
-	DrawImage(screen, imageData)
+		colorText = "({}, {}, {})".format(*self.brushColor)
+		colorTextSurface = self.fontRenderer.render(colorText, True, (230, 230, 230), self.backgroundColor)
+		screen.blit(colorTextSurface, (0, screen.get_height() - colorTextSurface.get_height()))
+		self.DrawImage(screen, imageData)
 
-	pygame.display.flip()
+		pygame.display.flip()
+
+	def DrawPixelAtIndex(self, surface, color, index):
+		coords = IndexToCoordinates(index)
+		DrawPixel(surface, color, coords[0], coords[1])
+
+	def DrawImage(self, surface, imageData):
+		for index, pixel in enumerate(imageData):
+			self.DrawPixelAtIndex(surface, pixel, index)
+
 
 def main(argv):
 	assert (len(argv) == 2), "Usage: {} <image filename>".format(argv[0])
 	pygame.init()
 	filename = argv[1]
-	fontRenderer = pygame.font.SysFont("monospace", 42)
 
 	windowSize = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE) + COLOR_PICKER_HEIGHT
+	drawingScene = DrawingScene(pygame.Color("Black"), pygame.Color("White"))
 	screen = pygame.display.set_mode(windowSize)
 
 	imageData = LoadPixData(filename)
-	brushColor = bytearray((0, 0, 0))
 	clock = pygame.time.Clock()
 
 	while 1:
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_ESCAPE:
+				keys = pygame.key.get_pressed()
+				if keys[pygame.K_ESCAPE]:
 					sys.exit()
-				elif event.key == pygame.K_s:
+				elif keys[pygame.K_LCTRL] and keys[pygame.K_s]:
 					print("Saving to {}".format(filename))
 					WritePixData(filename, imageData)
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if (event.type == pygame.MOUSEMOTION and event.buttons[0] == 1) or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
-				ColorPixelAtScreenCoordinates(imageData, event.pos, brushColor)
+				ColorPixelAtScreenCoordinates(imageData, event.pos, drawingScene.brushColor)
 
-		Loop(screen, imageData, brushColor, fontRenderer, windowSize)
+		drawingScene.OnLoop(screen, imageData)
 
 		clock.tick(30)
 
