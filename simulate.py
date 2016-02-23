@@ -29,8 +29,8 @@ class DrawingScene:
 		self.fontRenderer = pygame.font.SysFont("monospace", 42)
 		self.backgroundColor = backgroundColor
 		self.brushColor = initialBrushColor
-		self.drawableGridArea = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE)
-		self.totalArea = self.drawableGridArea[0], self.drawableGridArea[1] + COLOR_PICKER_HEIGHT
+		self.pixelGridArea = DISPLAY_WIDTH * (PIXEL_SIZE + BORDER_SIZE), DISPLAY_HEIGHT * (PIXEL_SIZE + BORDER_SIZE)
+		self.totalArea = self.pixelGridArea[0], self.pixelGridArea[1] + COLOR_PICKER_HEIGHT
 
 	def OnLoop(self, screen):
 		screen.fill(self.backgroundColor)
@@ -40,16 +40,25 @@ class DrawingScene:
 		screen.blit(colorTextSurface, (0, screen.get_height() - colorTextSurface.get_height()))
 		self.DrawImage(screen)
 
-	def HandleMouseClick(self, clickCoordinates):
-		# See if this is even in the area that we care about.
-		areaWeCareAbout = pygame.Rect((0, 0), self.drawableGridArea)
-		if not areaWeCareAbout.collidepoint(clickCoordinates):
+		# Color in the pixel that the mouse is currently hovering over.
+		if pygame.mouse.get_focused():
+			self.ColorPixelAtScreenCoordinates(screen, pygame.mouse.get_pos(), False)
+
+	def ColorPixelAtScreenCoordinates(self, screen, screenCoordinates, updateImage):
+		# Are these screen coordinates even in the drawing area?
+		drawableArea = pygame.Rect((0, 0), self.pixelGridArea)
+		if not drawableArea.collidepoint(screenCoordinates):
 			return
 
-		# Color the pixel that was clicked on.
-		pixelToColor = GetPixelAtScreenCoordinates(clickCoordinates)
-		modifiedPixelIndex = CoordinatesToIndex(pixelToColor[0], pixelToColor[1])
-		self.imageData[modifiedPixelIndex] = FormatPixel(self.brushColor, pixelToColor)
+		# Figure out which pixel is being selected.
+		pixelToColor = GetPixelAtScreenCoordinates(screenCoordinates)
+		selectedPixelIndex = CoordinatesToIndex(*pixelToColor)
+		self.DrawPixelAtIndex(screen, self.brushColor, selectedPixelIndex)
+		if updateImage:
+			self.imageData[selectedPixelIndex] = FormatPixel(self.brushColor, pixelToColor)
+
+	def HandleMouseClick(self, screen, clickCoordinates):
+		self.ColorPixelAtScreenCoordinates(screen, clickCoordinates, True)
 
 	def DrawPixelAtIndex(self, surface, color, index):
 		coords = IndexToCoordinates(index)
@@ -64,14 +73,17 @@ def main(argv):
 	assert (len(argv) == 2), "Usage: {} <image filename>".format(argv[0])
 	filename = argv[1]
 	pygame.init()
+	clock = pygame.time.Clock()
 
 	initialImageData = LoadPixData(filename)
 	drawingScene = DrawingScene(initialImageData, pygame.Color("Black"), pygame.Color("Black"))
 
-	clock = pygame.time.Clock()
+	pygame.display.set_caption("LED Board Simulator - {}".format(filename), filename)
 	screen = pygame.display.set_mode(drawingScene.totalArea)
 
 	while 1:
+		drawingScene.OnLoop(screen)
+
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
 				keys = pygame.key.get_pressed()
@@ -86,10 +98,8 @@ def main(argv):
 					print("Pressed a key")
 			if event.type == pygame.QUIT:
 				sys.exit()
-			if (event.type == pygame.MOUSEMOTION and event.buttons[0] == 1) or (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
-				drawingScene.HandleMouseClick(event.pos)
-
-		drawingScene.OnLoop(screen)
+			if ((event.type == pygame.MOUSEMOTION) and (event.buttons[0] == 1)) or ((event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
+				drawingScene.HandleMouseClick(screen, event.pos)
 
 		pygame.display.flip()
 
