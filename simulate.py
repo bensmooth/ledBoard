@@ -72,7 +72,7 @@ class DrawingScene:
 def main(argv):
 	assert (len(argv) == 2), "Usage: {} <image filename>".format(argv[0])
 	filename = argv[1]
-	pygame.init()
+	pygame.font.init()
 	clock = pygame.time.Clock()
 
 	initialImageData = LoadPixData(filename)
