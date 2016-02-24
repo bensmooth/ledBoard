@@ -86,16 +86,14 @@ def main(argv):
 
 		for event in pygame.event.get():
 			if event.type == pygame.KEYDOWN:
-				keys = pygame.key.get_pressed()
-				if keys[pygame.K_ESCAPE]:
+				if event.key == pygame.K_ESCAPE:
 					sys.exit()
-				elif keys[pygame.K_LCTRL]:
-					if keys[pygame.K_s]:
-						print("Saving to {}".format(filename))
-						WritePixData(filename, drawingScene.imageData)
+				elif event.key == pygame.K_s and event.mod & pygame.KMOD_CTRL:
+					print("Saving to {}".format(filename))
+					WritePixData(filename, drawingScene.imageData)
 				else:
 					# TODO: Handle color picker typing here.
-					print("Pressed a key")
+					print("Pressed a key: {}".format(pygame.key.name(event.key)))
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if ((event.type == pygame.MOUSEMOTION) and (event.buttons[0] == 1)) or ((event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
