@@ -81,6 +81,8 @@ def main(argv):
 	pygame.display.set_caption("LED Board Simulator - {}".format(filename), filename)
 	screen = pygame.display.set_mode(drawingScene.totalArea)
 
+	nextColorString = ""
+
 	while 1:
 		drawingScene.OnLoop(screen)
 
@@ -92,8 +94,24 @@ def main(argv):
 					print("Saving to {}".format(filename))
 					WritePixData(filename, drawingScene.imageData)
 				else:
-					# TODO: Handle color picker typing here.
-					print("Pressed a key: {}".format(pygame.key.name(event.key)))
+					if event.key == pygame.K_RETURN:
+						print("Attempting to set brush color to '{}'".format(nextColorString))
+						try:
+							drawingScene.brushColor = pygame.Color(nextColorString)
+							print("Brush color set to {}".format(drawingScene.brushColor))
+						except ValueError as exception:
+							print(str(exception))
+
+						nextColorString = ""
+					else:
+						keyName = pygame.key.name(event.key)
+						if event.key == pygame.K_3 and event.mod & pygame.KMOD_SHIFT:
+							nextColorString += "#"
+						elif len(keyName) == 1:
+							nextColorString += keyName
+						else:
+							print("Unhandled key: {}".format(keyName))
+
 			if event.type == pygame.QUIT:
 				sys.exit()
 			if ((event.type == pygame.MOUSEMOTION) and (event.buttons[0] == 1)) or ((event.type == pygame.MOUSEBUTTONDOWN and event.button == 1)):
