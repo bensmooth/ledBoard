@@ -43,6 +43,8 @@ int main(int argc, char* argv[])
 			}
 		}
 
+		renderTarget.Render(backbuffer);
+
 		this_thread::sleep_for(chrono::milliseconds(30));
 	}
 
