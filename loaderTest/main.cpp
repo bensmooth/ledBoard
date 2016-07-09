@@ -9,6 +9,7 @@ int main(int argc, char* argv[])
 	if (argc != 2)
 	{
 		cerr << "Usage: " << argv[0] << " <out filename>" << endl;
+		return -1;
 	}
 
 	Image image(18, 18);
