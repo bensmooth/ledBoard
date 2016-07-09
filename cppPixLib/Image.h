@@ -1,3 +1,4 @@
+#pragma once
 #include "Color.h"
 #include "boost/multi_array.hpp"
 
@@ -7,7 +8,7 @@ namespace Pix
 	{
 	public:
 		Image(uint32_t width, uint32_t height);
-		~Image();
+		virtual ~Image();
 
 		const Color& At(uint32_t x, uint32_t y) const;
 		Color& At(uint32_t x, uint32_t y);

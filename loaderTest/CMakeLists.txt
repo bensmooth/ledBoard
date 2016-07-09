@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.4)
 
 file(GLOB SRC_FILES *.cpp)
 add_executable(loaderTest ${SRC_FILES})

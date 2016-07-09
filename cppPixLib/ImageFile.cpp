@@ -2,6 +2,7 @@
 #include <boost/filesystem.hpp>
 #include <fstream>
 #include <sstream>
+#include "Exception.h"
 
 namespace Pix
 {
@@ -57,14 +58,14 @@ namespace Pix
 
 		if (expectedFileSize != actualFileSize)
 		{
-			throw std::out_of_range("Actual file size does not match expected file size.");
+			throw Exception("Actual file size does not match expected file size.");
 		}
 
 		std::ifstream instream(inFilename, std::ios::binary | std::ios::in);
 
 		if (instream.bad())
 		{
-			throw std::runtime_error("Unable to open input file: " + inFilename);
+			throw Exception("Unable to open input file: " + inFilename);
 		}
 
 		uint32_t imageWidth = out.GetWidth();
