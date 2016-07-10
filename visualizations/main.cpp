@@ -9,6 +9,12 @@
 using namespace std;
 using namespace Pix;
 
+inline uint8_t Psycho(double t)
+{
+	static constexpr auto PI = std::acos(-1);
+	return ((std::cos(t * PI / 180.0) + 1.0) / 2.0) * std::numeric_limits<uint8_t>::max();
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 2)
@@ -16,9 +22,6 @@ int main(int argc, char* argv[])
 		cerr << "Usage: " << argv[0] << " <out filename>" << endl;
 		return -1;
 	}
-
-	static constexpr auto PI = std::acos(-1);
-
 
 	FilesystemRenderTarget renderTarget(argv[1]);
 	Image backbuffer(18, 18);
@@ -28,12 +31,9 @@ int main(int argc, char* argv[])
 	while (true)
 	{
 		auto currentTime = std::chrono::steady_clock::now();
-		double elapsed = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - startTime).count();
-
-		uint8_t r = ((std::cos(elapsed * PI / 180.0) + 1.0) / 2.0) * std::numeric_limits<uint8_t>::max();
-
+		double elapsed = (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count()) / 1000.0;
 		Color current;
-		current.Set(r, 0, 0);
+		current.Set(Psycho(elapsed * 10.0), Psycho(elapsed * 20.0), Psycho(elapsed * 50.0));
 
 		for (int x = 0; x < backbuffer.GetWidth(); x++)
 		{
@@ -44,8 +44,9 @@ int main(int argc, char* argv[])
 		}
 
 		renderTarget.Render(backbuffer);
+		cout << "\rt = " << elapsed;
 
-		this_thread::sleep_for(chrono::milliseconds(30));
+		//this_thread::sleep_for(chrono::milliseconds(30));
 	}
 
 	return 0;
