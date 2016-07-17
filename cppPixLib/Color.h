@@ -20,6 +20,10 @@ namespace Pix
 		uint8_t& Green();
 		uint8_t& Blue();
 
+		const uint8_t& Red() const;
+		const uint8_t& Green() const;
+		const uint8_t& Blue() const;
+
 	private:
 		uint8_t m_r;
 		uint8_t m_g;
