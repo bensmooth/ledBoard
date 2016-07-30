@@ -10,5 +10,6 @@ include_directories(${CMAKE_SOURCE_DIR}/cppPixLib)
 add_subdirectory(cppPixLib)
 add_subdirectory(loaderTest)
 add_subdirectory(visualizations)
+add_subdirectory(life)
 
 #install(TARGETS cppPix RUNTIME DESTINATION bin)
