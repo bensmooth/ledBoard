@@ -69,9 +69,9 @@ uint32_t TakeStep(const Color& aliveColor, const Color& deadColor, const Image& 
 {
 	uint32_t aliveCellCount = 0;
 
-	for (int x = 0; x < GRID_WIDTH; x++)
+	for (int y = 0; y < GRID_HEIGHT; y++)
 	{
-		for (int y = 0; y < GRID_HEIGHT; y++)
+		for (int x = 0; x < GRID_WIDTH; x++)
 		{
 			uint8_t neighbourCount = CountNeighbors(oldGrid, x, y);
 
@@ -161,7 +161,6 @@ int main(int argc, char* argv[])
 			// Current color should never be all black!
 			assert(currentColor != DEAD_CELL_COLOR);
 
-			// TODO: Make it so that if we don't take a step, we redraw the existing board with the new current color.
 			if (totalFrameCount % 10 == 0 && !stopSimulation)
 			{
 				uint32_t aliveCellCount = TakeStep(currentColor, DEAD_CELL_COLOR, grids[previousIndex], grids[newIndex]);
@@ -174,6 +173,20 @@ int main(int argc, char* argv[])
 				{
 					cout << "Ended simulation after " << iterationCount << " iterations." << endl;
 					stopSimulation = true;
+				}
+			}
+			else
+			{
+				// If we don't take a step, we redraw the existing board with the new current color.
+				for (int y = 0; y < GRID_HEIGHT; y++)
+				{
+					for (int x = 0; x < GRID_WIDTH; x++)
+					{
+						if (CellIsAlive(grids[previousIndex], x, y))
+						{
+							grids[previousIndex] = currentColor;
+						}
+					}
 				}
 			}
 
