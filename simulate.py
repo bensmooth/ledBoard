@@ -20,7 +20,7 @@ def DrawPixel(surface, color, x, y):
 
 def GetPixelAtScreenCoordinates(xy):
 	xCoord = xy[0] / (PIXEL_SIZE + BORDER_SIZE)
-	yCoord = xy[1] / (PIXEL_SIZE + BORDER_SIZE) 
+	yCoord = xy[1] / (PIXEL_SIZE + BORDER_SIZE)
 	return (xCoord, yCoord)
 
 class DrawingScene:
