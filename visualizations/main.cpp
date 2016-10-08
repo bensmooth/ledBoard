@@ -3,50 +3,75 @@
 #include <chrono>
 #include <cmath>
 #include <limits>
+#include <memory>
 #include "FilesystemRenderTarget.h"
+#include "SDLRenderTarget.h"
 #include "Image.h"
+#include "FrameTimer.h"
 
 using namespace std;
 using namespace Pix;
 
+constexpr auto LED_DIMENSION = 18;
+
+
 inline uint8_t Psycho(double t)
 {
 	static constexpr auto PI = std::acos(-1);
-	return ((std::cos(t * PI / 180.0) + 1.0) / 2.0) * std::numeric_limits<uint8_t>::max();
+	return ((cos(t * PI / 180.0) + 1.0) / 2.0) * std::numeric_limits<uint8_t>::max();
 }
 
 int main(int argc, char* argv[])
 {
-	if (argc != 2)
+	if (argc != 1)
 	{
-		cerr << "Usage: " << argv[0] << " <out filename>" << endl;
+		cerr << "Usage: " << argv[0] << endl;
 		return -1;
 	}
 
-	FilesystemRenderTarget renderTarget(argv[1]);
-	Image backbuffer(18, 18);
+	double elapsed = 0.0;
 
-	auto startTime = std::chrono::steady_clock::now();
+	chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
+	uint64_t frameCount = 0;
 
-	while (true)
+	try
 	{
-		auto currentTime = std::chrono::steady_clock::now();
-		double elapsed = (std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime).count()) / 1000.0;
-		Color current;
-		current.Set(Psycho(elapsed * 10.0), Psycho(elapsed * 20.0), Psycho(elapsed * 50.0));
+		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
-		for (int x = 0; x < backbuffer.GetWidth(); x++)
+		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
+		FrameTimer timer(60.0);
+
+		while (true)
 		{
-			for (int y = 0; y < backbuffer.GetHeight(); y++)
+			timer.StartFrame();
+
+			chrono::steady_clock::time_point currentTime = chrono::steady_clock::now();
+			elapsed = (chrono::duration_cast<chrono::milliseconds>(currentTime - startTime).count()) / 1000.0;
+			Color current;
+			current.Set(Psycho(elapsed * 10.0), Psycho(elapsed * 20.0), Psycho(elapsed * 50.0));
+
+			for (int x = 0; x < backbuffer.GetWidth(); x++)
 			{
-				backbuffer.At(x, y) = current;
+				for (int y = 0; y < backbuffer.GetHeight(); y++)
+				{
+					backbuffer.At(x, y) = current;
+				}
 			}
+
+			renderTarget->Render(backbuffer);
+			frameCount++;
+
+			timer.EndFrame();
 		}
+	}
+	catch (const exception& ex)
+	{
+		cerr << "Something bad happened at t=" << elapsed << " - " << ex.what() << endl;
+	}
 
-		renderTarget.Render(backbuffer);
-		cout << "\rt = " << elapsed;
-
-		//this_thread::sleep_for(chrono::milliseconds(30));
+	if (elapsed > 0.0)
+	{
+		cout << "Average FPS: " << ((double)frameCount / elapsed) << endl;
 	}
 
 	return 0;

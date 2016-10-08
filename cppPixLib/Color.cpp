@@ -47,4 +47,19 @@ namespace Pix
 	{
 		return m_b;
 	}
+
+	const uint8_t& Color::Red() const
+	{
+		return m_r;
+	}
+
+	const uint8_t& Color::Green() const
+	{
+		return m_g;
+	}
+
+	const uint8_t& Color::Blue() const
+	{
+		return m_b;
+	}
 }
