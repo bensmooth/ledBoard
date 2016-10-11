@@ -6,6 +6,7 @@
 #include <limits>
 #include <memory>
 #include <cassert>
+#include <random>
 #include "IRenderTarget.h"
 #include "Image.h"
 #include "FrameTimer.h"
@@ -115,7 +116,22 @@ int main(int argc, char* argv[])
 
 	if (argc == 1)
 	{
-		// TODO: Make this the random mode...
+		random_device randomDevice;
+		default_random_engine randomEngine(randomDevice());
+		uniform_real_distribution<float> uniformDistribution(0, 1);
+
+		Color startingColor;
+		startingColor.Set(0xff, 0xff, 0xff);
+		for (int y = 0; y < GRID_HEIGHT; y++)
+		{
+			for (int x = 0; x < GRID_WIDTH; x++)
+			{
+				if (uniformDistribution(randomEngine) > 0.5f)
+				{
+					initialState.At(x, y) = startingColor;
+				}
+			}
+		}
 	}
 	else if (argc == 2)
 	{
@@ -184,7 +200,7 @@ int main(int argc, char* argv[])
 					{
 						if (CellIsAlive(grids[previousIndex], x, y))
 						{
-							grids[previousIndex] = currentColor;
+							grids[previousIndex].At(x, y) = currentColor;
 						}
 					}
 				}
