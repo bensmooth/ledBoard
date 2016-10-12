@@ -103,6 +103,11 @@ namespace Pix
 
 		// Write buffer.
 		std::ofstream outstream(outFilename, std::ios::out | std::ios::binary);
+		if (outstream.bad())
+		{
+			throw Exception("Unable to open file " + outFilename);
+		}
+
 		outstream.write(buffer.str().c_str(), fileSize);
 	}
 
