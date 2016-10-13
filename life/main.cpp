@@ -109,6 +109,99 @@ uint32_t TakeStep(const Color& aliveColor, const Color& deadColor, const Image& 
 	return aliveCellCount;
 }
 
+enum class TerminationReason
+{
+	Unknown = 0,
+	AllDead,
+	Cycling,
+	Timeout
+};
+
+const char* to_string(TerminationReason reason)
+{
+	switch(reason)
+	{
+		case TerminationReason::AllDead:
+			return "AllDead";
+		case TerminationReason::Cycling:
+			return "Cycling";
+		case TerminationReason::Timeout:
+			return "Timeout";
+		default:
+			return "Unknown";
+	}
+}
+
+// Returns the number of iterations that happen before the simulation stops or cycles.
+TerminationReason RunLife(IRenderTarget* renderTarget, const Image& initialState, uint32_t& outIterationCount)
+{
+	FrameTimer timer(30.0);
+	double elapsed = 0.0;
+	TerminationReason terminationReason = TerminationReason::Unknown;
+
+	Image grids[2] =
+	{
+		Image(initialState),
+		Image(GRID_WIDTH, GRID_HEIGHT)
+	};
+
+	int previousIndex = 0;
+	int newIndex = 1;
+
+	outIterationCount = 0;
+	bool stopSimulation = false;
+	chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
+	uint64_t totalFrameCount = 0;
+
+	while (true)
+	{
+		timer.StartFrame();
+
+		elapsed = (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - startTime).count()) / 1000.0;
+		Color currentColor;
+		currentColor.Set(Psycho(elapsed * 10.0), Psycho(elapsed * 20.0), Psycho(elapsed * 50.0));
+
+		// Current color should never be all black!
+		assert(currentColor != DEAD_CELL_COLOR);
+
+		if (totalFrameCount % 10 == 0 && !stopSimulation)
+		{
+			uint32_t aliveCellCount = TakeStep(currentColor, DEAD_CELL_COLOR, grids[previousIndex], grids[newIndex]);
+
+			previousIndex = (previousIndex + 1) % 2;
+			newIndex = (newIndex + 1) % 2;
+			outIterationCount++;
+
+			if (aliveCellCount == 0)
+			{
+				terminationReason = TerminationReason::AllDead;
+				stopSimulation = true;
+			}
+		}
+		else
+		{
+			// If we don't take a step, we redraw the existing board with the new current color.
+			for (int y = 0; y < GRID_HEIGHT; y++)
+			{
+				for (int x = 0; x < GRID_WIDTH; x++)
+				{
+					if (CellIsAlive(grids[previousIndex], x, y))
+					{
+						grids[previousIndex].At(x, y) = currentColor;
+					}
+				}
+			}
+		}
+
+		renderTarget->Render(grids[previousIndex]);
+		totalFrameCount++;
+
+		timer.EndFrame();
+	}
+
+	return terminationReason;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -143,83 +236,16 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	double elapsed = 0.0;
-
-	chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
-	uint64_t totalFrameCount = 0;
-
 	try
 	{
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], GRID_WIDTH, GRID_HEIGHT);
-
-		Image grids[2] =
-		{
-			Image(initialState),
-			Image(GRID_WIDTH, GRID_HEIGHT)
-		};
-
-		int previousIndex = 0;
-		int newIndex = 1;
-
-		FrameTimer timer(30.0);
-
-		uint32_t iterationCount = 0;
-		bool stopSimulation = false;
-
-		while (true)
-		{
-			timer.StartFrame();
-
-			elapsed = (chrono::duration_cast<chrono::milliseconds>(chrono::steady_clock::now() - startTime).count()) / 1000.0;
-			Color currentColor;
-			currentColor.Set(Psycho(elapsed * 10.0), Psycho(elapsed * 20.0), Psycho(elapsed * 50.0));
-
-			// Current color should never be all black!
-			assert(currentColor != DEAD_CELL_COLOR);
-
-			if (totalFrameCount % 10 == 0 && !stopSimulation)
-			{
-				uint32_t aliveCellCount = TakeStep(currentColor, DEAD_CELL_COLOR, grids[previousIndex], grids[newIndex]);
-
-				previousIndex = (previousIndex + 1) % 2;
-				newIndex = (newIndex + 1) % 2;
-				iterationCount++;
-
-				if (aliveCellCount == 0)
-				{
-					cout << "Ended simulation after " << iterationCount << " iterations." << endl;
-					stopSimulation = true;
-				}
-			}
-			else
-			{
-				// If we don't take a step, we redraw the existing board with the new current color.
-				for (int y = 0; y < GRID_HEIGHT; y++)
-				{
-					for (int x = 0; x < GRID_WIDTH; x++)
-					{
-						if (CellIsAlive(grids[previousIndex], x, y))
-						{
-							grids[previousIndex].At(x, y) = currentColor;
-						}
-					}
-				}
-			}
-
-			renderTarget->Render(grids[previousIndex]);
-			totalFrameCount++;
-
-			timer.EndFrame();
-		}
+		uint32_t iterations;
+		TerminationReason reason = RunLife(renderTarget.get(), initialState, iterations);
+		cout << "Ran for " << iterations << " iterations until life ended because of " << to_string(reason) << endl;
 	}
 	catch (const exception& ex)
 	{
-		cerr << "Something bad happened at t=" << elapsed << " - " << ex.what() << endl;
-	}
-
-	if (elapsed > 0.0)
-	{
-		cout << "Average FPS: " << ((double)totalFrameCount / elapsed) << endl;
+		cerr << "Something bad happened " << ex.what() << endl;
 	}
 
 	return 0;
