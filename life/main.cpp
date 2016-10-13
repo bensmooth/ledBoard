@@ -153,7 +153,7 @@ TerminationReason RunLife(IRenderTarget* renderTarget, const Image& initialState
 	chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
 	uint64_t totalFrameCount = 0;
 
-	while (true)
+	while (!stopSimulation)
 	{
 		timer.StartFrame();
 
@@ -202,6 +202,24 @@ TerminationReason RunLife(IRenderTarget* renderTarget, const Image& initialState
 	return terminationReason;
 }
 
+void GenerateRandomState(Image& randomState, uint64_t seed)
+{
+	mt19937 randomEngine;
+	randomEngine.seed(seed);
+	uniform_real_distribution<float> uniformDistribution(0, 1);
+
+	Color startingColor, backgroundColor;
+	startingColor.Set(0xff, 0xff, 0xff);
+	backgroundColor.Set(0, 0, 0);
+
+	for (int y = 0; y < randomState.GetHeight(); y++)
+	{
+		for (int x = 0; x < randomState.GetWidth(); x++)
+		{
+			randomState.At(x, y) = (uniformDistribution(randomEngine) > 0.5f) ? startingColor : backgroundColor;
+		}
+	}
+}
 
 int main(int argc, char* argv[])
 {
@@ -209,22 +227,9 @@ int main(int argc, char* argv[])
 
 	if (argc == 1)
 	{
-		random_device randomDevice;
-		default_random_engine randomEngine(randomDevice());
-		uniform_real_distribution<float> uniformDistribution(0, 1);
-
-		Color startingColor;
-		startingColor.Set(0xff, 0xff, 0xff);
-		for (int y = 0; y < GRID_HEIGHT; y++)
-		{
-			for (int x = 0; x < GRID_WIDTH; x++)
-			{
-				if (uniformDistribution(randomEngine) > 0.5f)
-				{
-					initialState.At(x, y) = startingColor;
-				}
-			}
-		}
+		uint64_t seed = 42;
+		cout << "Seeded with " << seed << endl;
+		GenerateRandomState(initialState, seed);
 	}
 	else if (argc == 2)
 	{
