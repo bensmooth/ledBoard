@@ -204,7 +204,7 @@ TerminationReason RunLife(IRenderTarget* renderTarget, const Image& initialState
 
 void GenerateRandomState(Image& randomState, uint64_t seed)
 {
-	mt19937 randomEngine;
+	minstd_rand randomEngine;
 	randomEngine.seed(seed);
 	uniform_real_distribution<float> uniformDistribution(0, 1);
 
