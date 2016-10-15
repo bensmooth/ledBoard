@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
 	if (argc == 1)
 	{
-		uint64_t seed = 42;
+		uint64_t seed = FrameTimer::GetMilliseconds();
 		cout << "Seeded with " << seed << endl;
 		initialState.Randomize(seed);
 	}

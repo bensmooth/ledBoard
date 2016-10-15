@@ -8,7 +8,7 @@ namespace Pix
 	{
 	public:
 		// Analagous to GetTickCount()...but may go backwards?
-		int64_t GetMillseconds();
+		static int64_t GetMilliseconds();
 
 		FrameTimer(double expectedFramesPerSecond);
 
