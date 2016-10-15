@@ -33,6 +33,15 @@ namespace Pix
 		m_b = b;
 	}
 
+	Color Color::Inverted() const
+	{
+		Color inverted;
+
+		inverted.Set(255 - m_r, 255 - m_g, 255 - m_b);
+
+		return inverted;
+	}
+
 	uint8_t& Color::Red()
 	{
 		return m_r;

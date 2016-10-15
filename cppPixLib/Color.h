@@ -23,6 +23,8 @@ namespace Pix
 		const uint8_t& Green() const;
 		const uint8_t& Blue() const;
 
+		Color Inverted() const;
+
 		friend bool operator==(const Color& lhs, const Color& rhs);
 
 	private:

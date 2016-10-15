@@ -95,7 +95,7 @@ TerminationReason RunLife(IRenderTarget* renderTarget, const BoardState& initial
 			currentState = newState;
 		}
 
-		currentState.ToImage(image, DEAD_CELL_COLOR, currentColor);
+		currentState.ToImage(image, currentColor.Inverted(), currentColor);
 		renderTarget->Render(image);
 		totalFrameCount++;
 
