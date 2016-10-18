@@ -118,31 +118,38 @@ int main(int argc, char* argv[])
 {
 	BoardState initialState;
 
-	if (argc == 1)
-	{
-		uint64_t seed = FrameTimer::GetMilliseconds();
-		cout << "Seeded with " << seed << endl;
-		initialState.Randomize(seed);
-	}
-	else if (argc == 2)
-	{
-		Image image(18, 18);
-		ImageFile::Read(argv[1], image);
-
-		initialState.FromImage(image, DEAD_CELL_COLOR);
-	}
-	else
-	{
-		cerr << "Usage: " << argv[0] << " <path to file containing initial state>" << endl;
-		return -1;
-	}
-
 	try
 	{
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], 18, 18);
-		uint32_t iterations;
-		TerminationReason reason = RunLife(renderTarget.get(), initialState, iterations);
-		cout << "Ran for " << iterations << " iterations until life ended because of " << to_string(reason) << endl;
+
+		bool continueLooping = true;
+
+		while (continueLooping)
+		{
+			if (argc == 1)
+			{
+				uint64_t seed = FrameTimer::GetMilliseconds();
+				cout << "Seeded with " << seed << endl;
+				initialState.Randomize(seed);
+			}
+			else if (argc == 2)
+			{
+				Image image(18, 18);
+				ImageFile::Read(argv[1], image);
+
+				initialState.FromImage(image, DEAD_CELL_COLOR);
+				continueLooping = false;
+			}
+			else
+			{
+				cerr << "Usage: " << argv[0] << " <path to file containing initial state>" << endl;
+				return -1;
+			}
+
+			uint32_t iterations;
+			TerminationReason reason = RunLife(renderTarget.get(), initialState, iterations);
+			cout << "Ran for " << iterations << " iterations until life ended because of " << to_string(reason) << endl;
+		}
 	}
 	catch (const exception& ex)
 	{
