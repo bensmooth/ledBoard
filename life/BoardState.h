@@ -41,9 +41,23 @@ namespace Pix
 		// Takes a step forward in the simulation.
 		static void TakeStep(const BoardState& currentState, BoardState& newState);
 
+		friend bool operator==(const BoardState& lhs, const BoardState& rhs);
+
 	private:
 		static uint32_t GetIndex(uint32_t x, uint32_t y);
 
 		State m_lifeState;
 	};
+
+
+	inline bool operator==(const BoardState& lhs, const BoardState& rhs)
+	{
+		return lhs.m_lifeState == rhs.m_lifeState;
+	}
+
+	inline bool operator!=(const BoardState& lhs, const BoardState& rhs)
+	{
+		return !operator==(lhs,rhs);
+	}
 }
+

@@ -2,6 +2,7 @@
 #include <string>
 #include <thread>
 #include <chrono>
+#include <deque>
 #include <cmath>
 #include <limits>
 #include <memory>
@@ -64,6 +65,7 @@ TerminationReason RunLife(IRenderTarget* renderTarget, const BoardState& initial
 	bool stopSimulation = false;
 	chrono::steady_clock::time_point startTime = chrono::steady_clock::now();
 	uint64_t totalFrameCount = 0;
+	std::deque<BoardState> previousStates;
 
 	while (!stopSimulation)
 	{
@@ -90,6 +92,13 @@ TerminationReason RunLife(IRenderTarget* renderTarget, const BoardState& initial
 			{
 				terminationReason = TerminationReason::AllDead;
 				stopSimulation = true;
+			}
+
+			previousStates.push_back(currentState);
+			if (std::find(previousStates.cbegin(), previousStates.cend(), newState) != previousStates.cend())
+			{
+				stopSimulation = true;
+				terminationReason = TerminationReason::Cycling;
 			}
 
 			currentState = newState;
