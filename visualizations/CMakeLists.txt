@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.4)
 
-file(GLOB SRC_FILES *.cpp)
-add_executable(visualizations ${SRC_FILES})
-target_link_libraries(visualizations cppPixLib)
+add_executable(psycho psycho.cpp)
+target_link_libraries(psycho cppPixLib)
+
+add_executable(perlin perlin.cpp)
+target_link_libraries(perlin cppPixLib)
