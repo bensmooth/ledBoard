@@ -23,6 +23,19 @@ namespace Pix
 		return m_height;
 	}
 
+	bool Image::PointIsInBounds(uint32_t x, uint32_t y) const
+	{
+		if (x < m_width)
+		{
+			if (y < m_height)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	const Color& Image::At(uint32_t x, uint32_t y) const
 	{
 		return m_image[x][y];

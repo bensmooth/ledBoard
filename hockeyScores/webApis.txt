@@ -1,0 +1,3 @@
+http://riccomini.name/posts/game-time-baby/2012-09-29-streaming-live-sports-schedule-scores-stats-api/
+http://www.espn.com/nhl/bottomline/scores
+http://live.nhle.com/GameData/RegularSeasonScoreboardv3.jsonp

@@ -15,6 +15,8 @@ namespace Pix
 
 		uint32_t GetWidth() const;
 		uint32_t GetHeight() const;
+		bool PointIsInBounds(uint32_t x, uint32_t y) const;
+
 	private:
 		typedef boost::multi_array<Color, 2> ImageArray;
 		ImageArray m_image;

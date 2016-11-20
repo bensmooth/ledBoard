@@ -7,7 +7,7 @@ if ( CMAKE_COMPILER_IS_GNUCC )
     set_property( TARGET cppPixLib APPEND_STRING PROPERTY COMPILE_FLAGS "-Wall -pedantic -Werror" )
 endif ( CMAKE_COMPILER_IS_GNUCC )
 
-find_package(Boost 1.40 COMPONENTS filesystem REQUIRED)
+find_package(Boost 1.40 COMPONENTS system filesystem REQUIRED)
 
 SET(SDL2PP_WITH_IMAGE ON) # if you need SDL_image support
 SET(SDL2PP_WITH_MIXER ON) # if you need SDL_mixer support
