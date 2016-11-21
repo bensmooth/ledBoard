@@ -44,7 +44,9 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			FontRenderer::RenderCharacter(VisitorFont::A(), backbuffer, fore, 1, 1);
+			FontRenderer::RenderText<TomThumbFont>("ABCD", backbuffer, fore, 1, 0);
+			FontRenderer::RenderText<TomThumbFont>("EFGH", backbuffer, fore, 1, 6);
+			FontRenderer::RenderText<TomThumbFont>("IJKL", backbuffer, fore, 1, 12);
 
 			renderTarget->Render(backbuffer);
 
