@@ -31,7 +31,9 @@ int main(int argc, char* argv[])
 
 		Color back, fore;
 		back.Set(0, 0, 0);
-		fore.Set(255, 0, 0);
+		fore.Set(0, 0, 255);
+
+		int32_t textX = LED_DIMENSION;
 
 		while (true)
 		{
@@ -45,12 +47,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			FontRenderer::RenderText<TomThumbFont>("OVER", backbuffer, fore, 1, 3);
-			FontRenderer::RenderText<TomThumbFont>("TIME", backbuffer, fore, 1, 9);
-
-			Color temp = back;
-			back = fore;
-			fore = temp;
+			FontRenderer::RenderText<TomThumbFont>("ABCDEFGHIJKLMNOPQRSTUVWXYZ", backbuffer, fore, textX--, 0);
 
 			renderTarget->Render(backbuffer);
 

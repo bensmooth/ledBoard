@@ -12,5 +12,6 @@ add_subdirectory(loaderTest)
 add_subdirectory(visualizations)
 add_subdirectory(life)
 add_subdirectory(hockeyScores)
+add_subdirectory(marquee)
 
 #install(TARGETS cppPix RUNTIME DESTINATION bin)
