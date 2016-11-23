@@ -16,11 +16,13 @@ constexpr auto LED_DIMENSION = 18;
 
 int main(int argc, char* argv[])
 {
-	if (argc != 1)
+	if (argc != 2)
 	{
-		cerr << "Usage: " << argv[0] << endl;
+		cerr << "Usage: " << argv[0] << " <string>" << endl;
 		return -1;
 	}
+
+	string toBeDisplayed = argv[1];
 
 	try
 	{
@@ -34,8 +36,13 @@ int main(int argc, char* argv[])
 		fore.Set(0, 0, 255);
 
 		int32_t textX = LED_DIMENSION;
+		int32_t textY = (LED_DIMENSION / 2) - (TomThumbFont::LetterHeight / 2);
 
-		while (true)
+		int32_t xVel = -1;
+		int32_t travelDistance = 2 * LED_DIMENSION + toBeDisplayed.size() * (TomThumbFont::LetterWidth + TomThumbFont::SpacingPixels);
+		int32_t frameCount = -travelDistance / xVel;
+
+		while (frameCount --> 0)
 		{
 			timer.StartFrame();
 
@@ -47,7 +54,8 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			FontRenderer::RenderText<TomThumbFont>("ABCDEFGHIJKLMNOPQRSTUVWXYZ", backbuffer, fore, textX--, 0);
+			FontRenderer::RenderText<TomThumbFont>(toBeDisplayed, backbuffer, fore, textX, textY);
+			textX += xVel;
 
 			renderTarget->Render(backbuffer);
 
