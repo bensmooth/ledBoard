@@ -20,8 +20,7 @@ def main(argv):
 	# Open our output file, and write header.
 	outfile = open(className + ".h", "w")
 
-	letters = string.ascii_letters + string.digits
-	# letters = string.printable
+	letters = string.ascii_letters + string.digits + string.punctuation + " \t"
 
 	renderedSize = GetFontRenderSize(font, letters)
 	print("Using bitmapped font size: {}".format(renderedSize))
@@ -29,7 +28,12 @@ def main(argv):
 	WriteHeader(outfile, className, fontFilename, renderedSize)
 
 	for letter in letters:
-		WriteLine(outfile, "		case '{}':".format(letter))
+		if letter == '\'' or letter == '\\':
+			caseValue = "\\" + letter
+		else:
+			caseValue = letter;
+
+		WriteLine(outfile, "		case '{}':".format(caseValue))
 		im = RenderLetter(font, letter, renderedSize)
 		WriteBitmap(outfile, im)
 
