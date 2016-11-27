@@ -1,1 +1,6 @@
 *.pyc
+.kdev4/
+build/
+cppPixLib/.kdev4/
+fft/
+ledBoard.kdev4

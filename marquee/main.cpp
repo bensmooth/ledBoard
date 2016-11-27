@@ -6,7 +6,7 @@
 #include "Image.h"
 #include "FrameTimer.h"
 #include "FontRenderer.h"
-#include "TomThumbFont.h"
+#include "fonts/TomThumbFont.h"
 
 using namespace std;
 using namespace Pix;
