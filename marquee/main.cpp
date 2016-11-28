@@ -6,7 +6,7 @@
 #include "Image.h"
 #include "FrameTimer.h"
 #include "FontRenderer.h"
-#include "fonts/TomThumbFont.h"
+#include "fonts/Visitor7Font.h"
 
 using namespace std;
 using namespace Pix;
@@ -26,6 +26,7 @@ int main(int argc, char* argv[])
 
 	try
 	{
+		using ActiveFont = Visitor7Font;
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
 		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
@@ -36,10 +37,10 @@ int main(int argc, char* argv[])
 		fore.Set(0, 0, 255);
 
 		int32_t textX = LED_DIMENSION;
-		int32_t textY = (LED_DIMENSION / 2) - (TomThumbFont::LetterHeight / 2);
+		int32_t textY = (LED_DIMENSION / 2) - (ActiveFont::LetterHeight / 2);
 
 		int32_t xVel = -1;
-		int32_t travelDistance = 2 * LED_DIMENSION + toBeDisplayed.size() * (TomThumbFont::LetterWidth + TomThumbFont::SpacingPixels);
+		int32_t travelDistance = 2 * LED_DIMENSION + toBeDisplayed.size() * (ActiveFont::LetterWidth + ActiveFont::SpacingPixels);
 		int32_t frameCount = -travelDistance / xVel;
 
 		while (frameCount --> 0)
@@ -54,7 +55,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			FontRenderer::RenderText<TomThumbFont>(toBeDisplayed, backbuffer, fore, textX, textY);
+			FontRenderer::RenderText<ActiveFont>(toBeDisplayed, backbuffer, fore, textX, textY);
 			textX += xVel;
 
 			renderTarget->Render(backbuffer);
