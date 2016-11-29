@@ -6,7 +6,7 @@
 #include "Image.h"
 #include "FrameTimer.h"
 #include "FontRenderer.h"
-#include "fonts/Prototype15Font.h"
+#include "fonts/TomThumbFont.h"
 
 using namespace std;
 using namespace Pix;
@@ -45,8 +45,8 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			FontRenderer::RenderText<Prototype15Font>("BULL", backbuffer, fore, 1, 3);
-			FontRenderer::RenderText<Prototype15Font>("SHIT", backbuffer, fore, 1, 9);
+			FontRenderer::RenderText<TomThumbFont>("BULL", backbuffer, fore, 1, 3);
+			FontRenderer::RenderText<TomThumbFont>("SHIT", backbuffer, fore, 1, 9);
 
 			Color temp = back;
 			back = fore;
