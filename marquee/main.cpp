@@ -6,14 +6,20 @@
 #include "Image.h"
 #include "FrameTimer.h"
 #include "FontRenderer.h"
-#include "fonts/Visitor12Font.h"
+#include "fonts/Prototype15Font.h"
 
-typedef Pix::Visitor12Font ActiveFont;
+typedef Pix::Prototype15Font ActiveFont;
 
 using namespace std;
 using namespace Pix;
 
 constexpr auto LED_DIMENSION = 18;
+
+
+int32_t RenderString(const std::string& text, Image& destination, const Color& color, int32_t x, int32_t y)
+{
+	return FontRenderer::RenderText<ActiveFont>(text, destination, color, x, y, RenderMode::ProportionalPitch);
+}
 
 
 int main(int argc, char* argv[])
@@ -41,7 +47,10 @@ int main(int argc, char* argv[])
 		int32_t textY = (LED_DIMENSION / 2) - (ActiveFont::LetterHeight / 2);
 
 		int32_t xVel = -1;
-		int32_t travelDistance = 2 * LED_DIMENSION + toBeDisplayed.size() * (ActiveFont::LetterWidth + ActiveFont::SpacingPixels);
+
+		// Get the total width of the string.
+		int32_t travelDistance = RenderString(toBeDisplayed, backbuffer, fore, 0, 0);
+		travelDistance += 2 * LED_DIMENSION;
 		int32_t frameCount = -travelDistance / xVel;
 
 		while (frameCount --> 0)
@@ -56,7 +65,7 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			FontRenderer::RenderText<ActiveFont>(toBeDisplayed, backbuffer, fore, textX, textY);
+			RenderString(toBeDisplayed, backbuffer, fore, textX, textY);
 			textX += xVel;
 
 			renderTarget->Render(backbuffer);

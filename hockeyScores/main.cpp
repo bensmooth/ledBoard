@@ -45,8 +45,8 @@ int main(int argc, char* argv[])
 				}
 			}
 
-			FontRenderer::RenderText<TomThumbFont>("BULL", backbuffer, fore, 1, 3);
-			FontRenderer::RenderText<TomThumbFont>("SHIT", backbuffer, fore, 1, 9);
+			FontRenderer::RenderText<TomThumbFont>("BULL", backbuffer, fore, 1, 3, RenderMode::FixedPitch);
+			FontRenderer::RenderText<TomThumbFont>("SHIT", backbuffer, fore, 1, 9, RenderMode::FixedPitch);
 
 			Color temp = back;
 			back = fore;
