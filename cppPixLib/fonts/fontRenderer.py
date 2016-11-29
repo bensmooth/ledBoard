@@ -13,7 +13,7 @@ def main(argv):
 	# use a bitmap font
 	if fontFilename.endswith(".ttf"):
 		fontSize = int(input("Enter font point size: "))
-		font = ImageFont.truetype(fontFilename, 15)
+		font = ImageFont.truetype(fontFilename, fontSize)
 	else:
 		font = ImageFont.load(fontFilename)
 

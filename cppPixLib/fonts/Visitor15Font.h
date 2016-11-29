@@ -4,7 +4,7 @@
 namespace Pix
 {
 // Generated from: sourceFonts/visitor.ttf
-class Visitor7Font
+class Visitor15Font
 {
 
 public:
