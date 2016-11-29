@@ -25,17 +25,26 @@ def main(argv):
 	renderedSize = GetFontRenderSize(font, letters)
 	print("Using bitmapped font size: {}".format(renderedSize))
 
+	# Prerender our glyphs beforehand.
+	imageDictionary = {}
+	for letter in letters:
+		imageDictionary[letter] = RenderLetter(font, letter, renderedSize)
+
+	# Find the smallest size that can hold any character.
+	renderedSize = GetSmallestSizeThatFitsAll(imageDictionary.values())
+
+	print("Shrank font size to: {}".format(renderedSize))
+
 	WriteHeader(outfile, className, fontFilename, renderedSize)
 
-	for letter in letters:
+	for letter in sorted(imageDictionary.keys()):
 		if letter == '\'' or letter == '\\':
 			caseValue = "\\" + letter
 		else:
-			caseValue = letter;
+			caseValue = letter
 
 		WriteLine(outfile, "		case '{}':".format(caseValue))
-		im = RenderLetter(font, letter, renderedSize)
-		WriteBitmap(outfile, im)
+		WriteBitmap(outfile, imageDictionary[letter], renderedSize)
 
 	WriteFooter(outfile, renderedSize)
 
@@ -53,6 +62,23 @@ def GetFontRenderSize(font, letters):
 		height = max(height, letterDimensions[1])
 
 	return (width, height)
+
+
+def GetSmallestSizeThatFitsAll(glyphs):
+	# Figure out the largest actual width, and largest actual height.
+	runningWidth = 0
+	runningHeight = 0
+
+	for glyph in glyphs:
+		# Get this glyph's actual dimensions.
+		actualDimensions = glyph.getbbox()
+
+		# If get get none back, that means it is whitespace.
+		if actualDimensions != None:
+			runningWidth = max(runningWidth, actualDimensions[2])
+			runningHeight = max(runningHeight, actualDimensions[3])
+
+	return (runningWidth, runningHeight)
 
 
 def RenderLetter(font, letter, renderSize):
@@ -91,7 +117,7 @@ def WriteHeader(outfile, className, fontFilename, bitmapDim):
 	WriteLine(outfile, "	typedef std::array<std::array<bool, {}>, {}> FontBitmapType;".format(bitmapDim[0], bitmapDim[1]))
 	WriteLine(outfile, "")
 	WriteLine(outfile, "	// The number of pixels after each letter.")
-	WriteLine(outfile, "	static constexpr uint16_t SpacingPixels = 0;")
+	WriteLine(outfile, "	static constexpr uint16_t SpacingPixels = 1;")
 	WriteLine(outfile, "")
 	WriteLine(outfile, "	static constexpr uint16_t LetterHeight = std::tuple_size<FontBitmapType>::value;")
 	WriteLine(outfile, "	static constexpr uint16_t LetterWidth = std::tuple_size<FontBitmapType::value_type>::value;")
@@ -102,12 +128,12 @@ def WriteHeader(outfile, className, fontFilename, bitmapDim):
 	WriteLine(outfile, "		{")
 
 
-def WriteBitmap(outfile, bitmap):
+def WriteBitmap(outfile, bitmap, renderSize):
 	# What we are going for:
 	#				{1, 1, 1},
 
-	width = bitmap.size[0]
-	height = bitmap.size[1]
+	width = renderSize[0]
+	height = renderSize[1]
 
 	WriteLine(outfile, "			return FontBitmapType")
 	WriteLine(outfile, "			{{")
@@ -131,7 +157,7 @@ def WriteBitmap(outfile, bitmap):
 def WriteFooter(outfile, bitmapDim):
 	WriteLine(outfile, "		default:")
 	allWhite = Image.new(imageMode, bitmapDim, 1)
-	WriteBitmap(outfile, allWhite)
+	WriteBitmap(outfile, allWhite, bitmapDim)
 	WriteLine(outfile, "		}")
 	WriteLine(outfile, "	}")
 	WriteLine(outfile, "};")

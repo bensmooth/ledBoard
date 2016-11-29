@@ -6,7 +6,9 @@
 #include "Image.h"
 #include "FrameTimer.h"
 #include "FontRenderer.h"
-#include "fonts/Visitor15Font.h"
+#include "fonts/Visitor12Font.h"
+
+typedef Pix::Visitor12Font ActiveFont;
 
 using namespace std;
 using namespace Pix;
@@ -26,7 +28,6 @@ int main(int argc, char* argv[])
 
 	try
 	{
-		using ActiveFont = Visitor15Font;
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
 		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
