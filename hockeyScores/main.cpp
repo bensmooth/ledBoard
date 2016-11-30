@@ -7,6 +7,7 @@
 #include "FrameTimer.h"
 #include "FontRenderer.h"
 #include "fonts/Prototype15Font.h"
+#include "fonts/Visitor12Font.h"
 #include "fonts/TomThumbFont.h"
 
 using namespace std;
@@ -43,7 +44,7 @@ int main(int argc, char* argv[])
 	}
 
 	TeamInfo team1;
-	team1.primaryColor.Set(0, 79, 48);
+	team1.primaryColor.Set(0, 80, 24);
 	team1.secondaryColor.Set(241, 179, 16);
 	team1.score = 5;
 	team1.stateAbbreviation = "MN";
@@ -89,8 +90,10 @@ int main(int argc, char* argv[])
 			FontRenderer::RenderText<Prototype15Font>(to_string(team1.score), backbuffer, team1.secondaryColor, -1, scoreY, RenderMode::FixedPitch);
 			FontRenderer::RenderText<Prototype15Font>(to_string(team2.score), backbuffer, team2.secondaryColor, LED_DIMENSION / 2, scoreY, RenderMode::FixedPitch);
 
-			FontRenderer::RenderText<TomThumbFont>(team1.stateAbbreviation, backbuffer, team1.secondaryColor, 1, 0, RenderMode::FixedPitch);
-			FontRenderer::RenderText<TomThumbFont>(team2.stateAbbreviation, backbuffer, team2.secondaryColor, LED_DIMENSION / 2 + 1, 0, RenderMode::FixedPitch);
+			FontRenderer::RenderText<Visitor12Font>(team1.stateAbbreviation, backbuffer, team1.secondaryColor,
+				0, 0, RenderMode::FixedPitch);
+			FontRenderer::RenderText<Visitor12Font>(team2.stateAbbreviation, backbuffer, team2.secondaryColor,
+				LED_DIMENSION / 2, 0, RenderMode::FixedPitch);
 
 			renderTarget->Render(backbuffer);
 
