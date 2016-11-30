@@ -8,6 +8,8 @@ namespace Pix
 	{
 	public:
 		Color();
+		Color(uint8_t r, uint8_t g, uint8_t b);
+
 		~Color();
 
 		void Write(std::ostream& outstream);

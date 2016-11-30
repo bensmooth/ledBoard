@@ -6,12 +6,32 @@
 #include "Image.h"
 #include "FrameTimer.h"
 #include "FontRenderer.h"
+#include "fonts/Prototype15Font.h"
 #include "fonts/TomThumbFont.h"
 
 using namespace std;
 using namespace Pix;
 
 constexpr auto LED_DIMENSION = 18;
+
+
+struct TeamInfo
+{
+	Color primaryColor;
+	Color secondaryColor;
+
+	uint8_t score;
+
+	std::string stateAbbreviation;
+};
+
+
+// TODO: Make this happen if stuff happens in the game.
+// FontRenderer::RenderText<TomThumbFont>("BULL", backbuffer, fore, 1, 3, RenderMode::FixedPitch);
+// FontRenderer::RenderText<TomThumbFont>("SHIT", backbuffer, fore, 1, 9, RenderMode::FixedPitch);
+// Color temp = back;
+// back = fore;
+// fore = temp;
 
 
 int main(int argc, char* argv[])
@@ -22,16 +42,24 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
+	TeamInfo team1;
+	team1.primaryColor.Set(0, 79, 48);
+	team1.secondaryColor.Set(241, 179, 16);
+	team1.score = 5;
+	team1.stateAbbreviation = "MN";
+
+	TeamInfo team2;
+	team2.primaryColor.Set(198, 12, 48);
+	team2.secondaryColor.Set(255, 255, 255);
+	team2.score = 2;
+	team2.stateAbbreviation = "IL";
+
 	try
 	{
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
 		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
-		FrameTimer timer(10.0);
-
-		Color back, fore;
-		back.Set(0, 0, 0);
-		fore.Set(255, 0, 0);
+		FrameTimer timer(1.0);
 
 		while (true)
 		{
@@ -41,16 +69,28 @@ int main(int argc, char* argv[])
 			{
 				for (int y = 0; y < backbuffer.GetHeight(); y++)
 				{
-					backbuffer.At(x, y) = back;
+					Color currentColor;
+					if (x < (LED_DIMENSION / 2))
+					{
+						// Left team.
+						currentColor = team1.primaryColor;
+					}
+					else
+					{
+						// Right team.
+						currentColor = team2.primaryColor;
+					}
+
+					backbuffer.At(x, y) = currentColor;
 				}
 			}
 
-			FontRenderer::RenderText<TomThumbFont>("BULL", backbuffer, fore, 1, 3, RenderMode::FixedPitch);
-			FontRenderer::RenderText<TomThumbFont>("SHIT", backbuffer, fore, 1, 9, RenderMode::FixedPitch);
+			int32_t scoreY = 3;
+			FontRenderer::RenderText<Prototype15Font>(to_string(team1.score), backbuffer, team1.secondaryColor, -1, scoreY, RenderMode::FixedPitch);
+			FontRenderer::RenderText<Prototype15Font>(to_string(team2.score), backbuffer, team2.secondaryColor, LED_DIMENSION / 2, scoreY, RenderMode::FixedPitch);
 
-			Color temp = back;
-			back = fore;
-			fore = temp;
+			FontRenderer::RenderText<TomThumbFont>(team1.stateAbbreviation, backbuffer, team1.secondaryColor, 1, 0, RenderMode::FixedPitch);
+			FontRenderer::RenderText<TomThumbFont>(team2.stateAbbreviation, backbuffer, team2.secondaryColor, LED_DIMENSION / 2 + 1, 0, RenderMode::FixedPitch);
 
 			renderTarget->Render(backbuffer);
 

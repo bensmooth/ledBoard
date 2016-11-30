@@ -8,6 +8,11 @@ namespace Pix
 	{
 	}
 
+	Color::Color::Color(uint8_t r, uint8_t g, uint8_t b)
+		: m_r(r), m_g(g), m_b(b)
+	{
+	}
+
 	Color::~Color()
 	{
 	}
