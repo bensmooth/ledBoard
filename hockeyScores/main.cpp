@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	vector<GameInfo> games = LoadJson("/home/ben/code/ledBoard/hockeyScores/RegularSeasonScoreboardv3Trimmed.jsonp");
+	vector<GameInfo> games = LoadJson("RegularSeasonScoreboardv3Trimmed.jsonp");
 
 	// Find the game we are interested in.
 	size_t currentGameIndex = -1;
