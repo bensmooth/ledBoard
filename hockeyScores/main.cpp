@@ -2,6 +2,8 @@
 #include <thread>
 #include <limits>
 #include <memory>
+#include <string>
+#include <sstream>
 #include "FilesystemRenderTarget.h"
 #include "Image.h"
 #include "FrameTimer.h"
@@ -10,6 +12,7 @@
 #include "fonts/TomThumbFont.h"
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <boost/asio.hpp>
 
 
 using namespace std;
@@ -17,7 +20,7 @@ using namespace Pix;
 
 constexpr auto LED_DIMENSION = 18;
 
-
+using boost::asio::ip::tcp;
 using PropertyTree = boost::property_tree::ptree;
 
 
@@ -67,45 +70,60 @@ ostream& operator<< (ostream& stream, const GameInfo& gameInfo)
 }
 
 
-string indent(int level) {
-  string s; 
-  for (int i=0; i<level; i++) s += "  ";
-  return s; 
-} 
+string indent(int level)
+{
+	string s;
+	for (int i=0; i<level; i++)
+	{
+		s += "  ";
+	}
 
-void printTree (boost::property_tree::ptree &pt, int level) {
-  if (pt.empty()) {
-    cout << "\""<< pt.data()<< "\"";
-  }
-
-  else {
-    if (level) cout << endl; 
-
-    cout << indent(level) << "{" << endl;     
-
-    for (boost::property_tree::ptree::iterator pos = pt.begin(); pos != pt.end();) {
-      cout << indent(level+1) << "\"" << pos->first << "\": "; 
-
-      printTree(pos->second, level + 1); 
-      ++pos; 
-      if (pos != pt.end()) {
-        cout << ","; 
-      }
-      cout << endl;
-    } 
-
-   cout << indent(level) << " }";
-  }
-
-  return; 
+	return s;
 }
 
-vector<GameInfo> LoadJson(const std::string& filePath)
+void printTree(boost::property_tree::ptree &pt, int level)
+{
+	if (pt.empty())
+	{
+		cout << "\""<< pt.data()<< "\"";
+	}
+	else
+	{
+		if (level)
+		{
+			cout << endl;
+		}
+
+		cout << indent(level) << "{" << endl;
+
+		for (boost::property_tree::ptree::iterator pos = pt.begin(); pos != pt.end();)
+		{
+			cout << indent(level+1) << "\"" << pos->first << "\": ";
+
+			printTree(pos->second, level + 1);
+			pos++;
+
+			if (pos != pt.end())
+			{
+				cout << ",";
+			}
+
+			cout << endl;
+		}
+
+		cout << indent(level) << " }";
+	}
+
+	return; 
+}
+
+template <class T>
+vector<GameInfo> LoadJson(T& source)
 {
 	vector<GameInfo> gameInfo;
 
 	PropertyTree json;
-	boost::property_tree::read_json(filePath, json);
+	boost::property_tree::read_json(source, json);
 
 // 	printTree(json, 0);
 
@@ -124,6 +142,90 @@ vector<GameInfo> LoadJson(const std::string& filePath)
 	return gameInfo;
 }
 
+
+stringstream HttpGet(const string& hostname, const string& path)
+{
+	stringstream body;
+
+	// Get a list of endpoints corresponding to the server name.
+	boost::asio::io_service io_service;
+	tcp::resolver resolver(io_service);
+	tcp::resolver::query query(hostname, "http");
+	tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+
+	// Try each endpoint until we successfully establish a connection.
+	tcp::socket socket(io_service);
+	boost::asio::connect(socket, endpoint_iterator);
+
+	// Form the request. We specify the "Connection: close" header so that the
+	// server will close the socket after transmitting the response. This will
+	// allow us to treat all data up until the EOF as the content.
+	boost::asio::streambuf request;
+	std::ostream request_stream(&request);
+	request_stream << "GET " << path << " HTTP/1.0\r\n";
+	request_stream << "Host: " << hostname << "\r\n";
+	request_stream << "Accept: */*\r\n";
+	request_stream << "Connection: close\r\n\r\n";
+
+	// Send the request.
+	boost::asio::write(socket, request);
+
+	// Read the response status line. The response streambuf will automatically
+	// grow to accommodate the entire line. The growth may be limited by passing
+	// a maximum size to the streambuf constructor.
+	boost::asio::streambuf response;
+	boost::asio::read_until(socket, response, "\r\n");
+
+	// Check that response is OK.
+	std::istream response_stream(&response);
+	std::string http_version;
+	response_stream >> http_version;
+	unsigned int status_code;
+	response_stream >> status_code;
+	std::string status_message;
+	std::getline(response_stream, status_message);
+	if (!response_stream || http_version.substr(0, 5) != "HTTP/")
+	{
+		throw runtime_error("Invalid response");
+	}
+
+	if (status_code != 200)
+	{
+		throw runtime_error("Response returned with status code " + to_string(status_code));
+	}
+
+	// Read the response headers, which are terminated by a blank line.
+	boost::asio::read_until(socket, response, "\r\n\r\n");
+
+	// Process the response headers.
+	std::string header;
+	while (std::getline(response_stream, header) && header != "\r")
+	{
+		std::cout << header << "\n";
+	}
+
+	bool seenOpenBracket = false;
+
+	// Write whatever content we already have to output.
+	if (response.size() > 0)
+	{
+		body << &response;
+	}
+
+	// Read until EOF, writing data to output as we go.
+	boost::system::error_code error;
+	while (boost::asio::read(socket, response, boost::asio::transfer_at_least(1), error))
+	{
+		body << &response;
+	}
+
+	if (error != boost::asio::error::eof)
+	{
+		throw boost::system::system_error(error);
+	}
+
+	return body;
+}
 
 void RenderGame(const GameInfo& game, Image& renderTarget)
 {
@@ -158,6 +260,49 @@ void RenderGame(const GameInfo& game, Image& renderTarget)
 	FontRenderer::RenderText<TomThumbFont>(team2.teamName.substr(0, 2), renderTarget, team2.secondaryColor, LED_DIMENSION / 2 + 1, 0, RenderMode::FixedPitch);
 }
 
+vector<GameInfo> PopulateGamesList()
+{
+	// TODO: Change the date passed in to today.
+	string path = "/GameData/RegularSeasonScoreboardv3.jsonp";
+	stringstream jsonStream = HttpGet("live.nhle.com", path);
+
+	// Trim to the first and last {}
+	// TODO: The correct way to do this would probably be to modify our stream code in HttpGet to only get the JSON.
+	string json = jsonStream.str();
+	size_t firstBracket = json.find_first_of('{');
+	size_t lastBracket = json.find_last_of('}');
+
+	if ((firstBracket == string::npos) || (lastBracket == string::npos) || (firstBracket > lastBracket))
+	{
+		throw runtime_error("Strange JSON?");
+	}
+
+	size_t jsonLength = lastBracket - firstBracket + 1;
+	jsonStream.str(json.substr(firstBracket, jsonLength));
+
+	try
+	{
+		return LoadJson(jsonStream);
+	}
+	catch (exception)
+	{
+		const char* jsonDumpFilename = "games.json";
+		cerr << "Failed to parse json...dumping to " << jsonDumpFilename << endl;
+
+		try
+		{
+			ofstream dump(jsonDumpFilename);
+			dump << jsonStream.str();
+			dump.close();
+		}
+		catch (exception)
+		{
+		}
+
+		// Rethrow original parser exception.
+		throw;
+	}
+}
 
 int main(int argc, char* argv[])
 {
@@ -167,7 +312,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	vector<GameInfo> games = LoadJson("RegularSeasonScoreboardv3Trimmed.jsonp");
+	vector<GameInfo> games = PopulateGamesList();
 
 	// Find the game we are interested in.
 	size_t currentGameIndex = -1;
@@ -193,7 +338,7 @@ int main(int argc, char* argv[])
 // 	team1.secondaryColor.Set(241, 179, 16);
 // 	team1.score = 5;
 // 	team1.teamName = "Minnesota Wild";
-// 
+
 // 	TeamInfo team2;
 // 	team2.primaryColor.Set(198, 12, 48);
 // 	team2.secondaryColor.Set(255, 255, 255);
