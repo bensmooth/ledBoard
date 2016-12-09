@@ -62,6 +62,7 @@ struct GameInfo
 	TeamInfo awayTeam;
 };
 
+
 ostream& operator<< (ostream& stream, const GameInfo& gameInfo)
 {
 	stream << gameInfo.awayTeam << " at " << gameInfo.homeTeam;
@@ -70,53 +71,6 @@ ostream& operator<< (ostream& stream, const GameInfo& gameInfo)
 }
 
 
-string indent(int level)
-{
-	string s;
-	for (int i=0; i<level; i++)
-	{
-		s += "  ";
-	}
-
-	return s;
-}
-
-void printTree(boost::property_tree::ptree &pt, int level)
-{
-	if (pt.empty())
-	{
-		cout << "\""<< pt.data()<< "\"";
-	}
-	else
-	{
-		if (level)
-		{
-			cout << endl;
-		}
-
-		cout << indent(level) << "{" << endl;
-
-		for (boost::property_tree::ptree::iterator pos = pt.begin(); pos != pt.end();)
-		{
-			cout << indent(level+1) << "\"" << pos->first << "\": ";
-
-			printTree(pos->second, level + 1);
-			pos++;
-
-			if (pos != pt.end())
-			{
-				cout << ",";
-			}
-
-			cout << endl;
-		}
-
-		cout << indent(level) << " }";
-	}
-
-	return; 
-}
-
 template <class T>
 vector<GameInfo> LoadJson(T& source)
 {
@@ -124,8 +78,6 @@ vector<GameInfo> LoadJson(T& source)
 
 	PropertyTree json;
 	boost::property_tree::read_json(source, json);
-
-// 	printTree(json, 0);
 
 	const PropertyTree& games = json.get_child("games");
 
@@ -204,8 +156,6 @@ stringstream HttpGet(const string& hostname, const string& path)
 		std::cout << header << "\n";
 	}
 
-	bool seenOpenBracket = false;
-
 	// Write whatever content we already have to output.
 	if (response.size() > 0)
 	{
@@ -262,8 +212,7 @@ void RenderGame(const GameInfo& game, Image& renderTarget)
 
 vector<GameInfo> PopulateGamesList()
 {
-	// TODO: Change the date passed in to today.
-	string path = "/GameData/RegularSeasonScoreboardv3.jsonp";
+	const string path = "/GameData/RegularSeasonScoreboardv3.jsonp";
 	stringstream jsonStream = HttpGet("live.nhle.com", path);
 
 	// Trim to the first and last {}
