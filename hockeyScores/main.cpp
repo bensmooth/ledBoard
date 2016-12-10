@@ -87,7 +87,6 @@ vector<GameInfo> LoadJson(T& source)
 
 		info.Populate(current.second);
 
-		cout << info << endl;
 		gameInfo.push_back(info);
 	}
 
@@ -153,7 +152,7 @@ stringstream HttpGet(const string& hostname, const string& path)
 	std::string header;
 	while (std::getline(response_stream, header) && header != "\r")
 	{
-		std::cout << header << "\n";
+// 		std::cout << header << "\n";
 	}
 
 	// Write whatever content we already have to output.
@@ -253,17 +252,8 @@ vector<GameInfo> PopulateGamesList()
 	}
 }
 
-int main(int argc, char* argv[])
+GameInfo FindMostInterestingGame(const vector<GameInfo>& games)
 {
-	if (argc != 1)
-	{
-		cerr << "Usage: " << argv[0] << endl;
-		return -1;
-	}
-
-	vector<GameInfo> games = PopulateGamesList();
-
-	// Find the game we are interested in.
 	size_t currentGameIndex = -1;
 	for (size_t i = 0; i < games.size(); i++)
 	{
@@ -280,7 +270,16 @@ int main(int argc, char* argv[])
 		currentGameIndex = 0;
 	}
 
-	cout << "Showing game: " << games[currentGameIndex] << endl;
+	return games[currentGameIndex];
+}
+
+int main(int argc, char* argv[])
+{
+	if (argc != 1)
+	{
+		cerr << "Usage: " << argv[0] << endl;
+		return -1;
+	}
 
 // 	TeamInfo team1;
 // 	team1.primaryColor.Set(0, 79, 48);
@@ -299,13 +298,18 @@ int main(int argc, char* argv[])
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
 		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
-		FrameTimer timer(1.0);
+		FrameTimer timer(1.0/60.0);
 
 		while (true)
 		{
 			timer.StartFrame();
 
-			RenderGame(games[currentGameIndex], backbuffer);
+			vector<GameInfo> games = PopulateGamesList();
+			GameInfo currentGame = FindMostInterestingGame(games);
+
+			cout << "Showing game: " << currentGame << endl;
+
+			RenderGame(currentGame, backbuffer);
 
 			renderTarget->Render(backbuffer);
 
