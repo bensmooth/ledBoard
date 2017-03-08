@@ -94,7 +94,7 @@ vector<GameInfo> LoadJson(T& source)
 }
 
 
-stringstream HttpGet(const string& hostname, const string& path)
+stringstream TryHttpGet(const string& hostname, const string& path)
 {
 	stringstream body;
 
@@ -176,6 +176,37 @@ stringstream HttpGet(const string& hostname, const string& path)
 	return body;
 }
 
+stringstream HttpGet(const string& hostname, const string& path, uint32_t retries)
+{
+	const auto timeToSleepBetweenTries = std::chrono::milliseconds(1000);
+	stringstream jsonStream;
+
+	for (uint32_t i = 0; i < retries; i++)
+	{
+		try
+		{
+			jsonStream = TryHttpGet(hostname, path);
+			break;
+		}
+		catch (const exception& ex)
+		{
+			cerr << "HTTP GET failed for http://" << (hostname + path) << " - " << ex.what();
+			cerr << "\tRetrying..." << (i+1) << " of " << retries << endl;
+
+			if (i == (retries - 1))
+			{
+				throw;
+			}
+			else
+			{
+				std::this_thread::sleep_for(timeToSleepBetweenTries);
+			}
+		}
+	}
+
+	return jsonStream;
+}
+
 void RenderGame(const GameInfo& game, Image& renderTarget)
 {
 	const TeamInfo& team1 = game.homeTeam;
@@ -211,8 +242,11 @@ void RenderGame(const GameInfo& game, Image& renderTarget)
 
 vector<GameInfo> PopulateGamesList()
 {
+	const string hostname = "live.nhle.com";
 	const string path = "/GameData/RegularSeasonScoreboardv3.jsonp";
-	stringstream jsonStream = HttpGet("live.nhle.com", path);
+
+	stringstream jsonStream;
+	jsonStream = HttpGet(hostname, path, 10);
 
 	// Trim to the first and last {}
 	// TODO: The correct way to do this would probably be to modify our stream code in HttpGet to only get the JSON.
