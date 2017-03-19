@@ -1,0 +1,10 @@
+[Unit]
+Description=Hockey Scores
+# TODO: add a conflicts section for other services that write to the led board.
+# http://unix.stackexchange.com/a/224091
+
+[Service]
+ExecStart=/usr/local/bin/hockeyScores
+
+[Install]
+WantedBy=multi-user.target
