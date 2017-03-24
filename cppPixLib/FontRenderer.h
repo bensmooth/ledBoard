@@ -18,7 +18,7 @@ class FontRenderer
 public:
 	// Renders a string onto an image.  Returns the actual width of the rendered string in pixels.
 	template<typename FontType>
-	static int32_t RenderText(const std::string& text, Image& destination, const Color& color, int32_t x, int32_t y, RenderMode renderMode)
+	static int32_t RenderText(const std::string& text, IImage& destination, const Color& color, int32_t x, int32_t y, RenderMode renderMode)
 	{
 		int32_t renderedWidth = 0;
 
@@ -45,7 +45,7 @@ public:
 
 	// Renders a character to an image.  Returns the actual width of the character that was rendered.
 	template<typename Character>
-	static uint32_t RenderCharacter(Character character, Image& destination, const Color& color, int32_t x, uint32_t y)
+	static uint32_t RenderCharacter(Character character, IImage& destination, const Color& color, int32_t x, uint32_t y)
 	{
 		uint32_t actualWidth = 0;
 

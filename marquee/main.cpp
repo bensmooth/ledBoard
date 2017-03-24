@@ -16,7 +16,7 @@ using namespace Pix;
 constexpr auto LED_DIMENSION = 18;
 
 
-int32_t RenderString(const std::string& text, Image& destination, const Color& color, int32_t x, int32_t y)
+int32_t RenderString(const std::string& text, IImage& destination, const Color& color, int32_t x, int32_t y)
 {
 	return FontRenderer::RenderText<ActiveFont>(text, destination, color, x, y, RenderMode::ProportionalPitch);
 }
@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 	{
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
-		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
+		ImageBuffer backbuffer(LED_DIMENSION, LED_DIMENSION);
 		FrameTimer timer(10.0);
 
 		Color back, fore;
@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
 		travelDistance += 2 * LED_DIMENSION;
 		int32_t frameCount = -travelDistance / xVel;
 
+		// Sweet usage of 'goes to' operator!
 		while (frameCount --> 0)
 		{
 			timer.StartFrame();

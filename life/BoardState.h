@@ -24,10 +24,10 @@ namespace Pix
 		void Randomize(uint64_t seed);
 
 		// Takes in an image of the correct dimensions, and converts it to a state.
-		void FromImage(const Image& image, Color deadColor);
+		void FromImage(const IImage& image, Color deadColor);
 
 		// Writes the current state to an image.
-		void ToImage(Image& image, Color deadColor, Color aliveColor);
+		void ToImage(IImage& image, Color deadColor, Color aliveColor);
 
 		bool Get(uint32_t x, uint32_t y) const;
 		void Set(uint32_t x, uint32_t y, bool value);

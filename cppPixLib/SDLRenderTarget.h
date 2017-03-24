@@ -17,7 +17,7 @@ namespace Pix
 		SDLRenderTarget(const std::string& windowTitle, int32_t windowWidth, int32_t windowHeight);
 		~SDLRenderTarget() override;
 
-		void Render(const Image& image) override;
+		void Render(const IImage& image) override;
 
 	private:
 		std::unique_ptr<SDL2pp::SDL> m_sdl;

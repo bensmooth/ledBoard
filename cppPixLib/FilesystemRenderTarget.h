@@ -10,7 +10,7 @@ namespace Pix
 		FilesystemRenderTarget(const std::string& targetFilename);
 		~FilesystemRenderTarget() override;
 
-		void Render(const Image& image) override;
+		void Render(const IImage& image) override;
 
 	private:
 		std::string m_targetFilename;

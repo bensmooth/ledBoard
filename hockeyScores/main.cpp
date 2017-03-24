@@ -207,7 +207,7 @@ stringstream HttpGet(const string& hostname, const string& path, uint32_t retrie
 	return jsonStream;
 }
 
-void RenderGame(const GameInfo& game, Image& renderTarget)
+void RenderGame(const GameInfo& game, IImage& renderTarget)
 {
 	const TeamInfo& team1 = game.homeTeam;
 	const TeamInfo& team2 = game.awayTeam;
@@ -331,7 +331,7 @@ int main(int argc, char* argv[])
 	{
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
-		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
+		ImageBuffer backbuffer(LED_DIMENSION, LED_DIMENSION);
 		FrameTimer timer(1.0/60.0);
 
 		while (true)

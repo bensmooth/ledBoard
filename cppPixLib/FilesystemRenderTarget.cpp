@@ -12,7 +12,7 @@ namespace Pix
 	{
 	}
 
-	void FilesystemRenderTarget::Render(const Image& image)
+	void FilesystemRenderTarget::Render(const IImage& image)
 	{
 		ImageFile::Write(image, m_targetFilename);
 	}

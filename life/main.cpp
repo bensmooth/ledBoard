@@ -55,7 +55,7 @@ TerminationReason RunLife(IRenderTarget* renderTarget, const BoardState& initial
 	double elapsed = 0.0;
 	TerminationReason terminationReason = TerminationReason::Unknown;
 
-	Image image(18, 18);
+	ImageBuffer image(18, 18);
 	BoardState currentState = initialState;
 
 	int previousIndex = 0;
@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
 			}
 			else if (argc == 2)
 			{
-				Image image(18, 18);
+				ImageBuffer image(18, 18);
 				ImageFile::Read(argv[1], image);
 
 				initialState.FromImage(image, DEAD_CELL_COLOR);
