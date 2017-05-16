@@ -51,7 +51,7 @@ namespace Pix
 	}
 
 
-	void ImageFile::Read(const std::string& inFilename, Image& out)
+	void ImageFile::Read(const std::string& inFilename, IImage& out)
 	{
 		size_t expectedFileSize = GetExpectedFilesize(out);
 		size_t actualFileSize = boost::filesystem::file_size(inFilename);
@@ -83,7 +83,7 @@ namespace Pix
 		}
 	}
 
-	void ImageFile::Write(const Image& image, const std::string& outFilename)
+	void ImageFile::Write(const IImage& image, const std::string& outFilename)
 	{
 		uint32_t imageWidth = image.GetWidth();
 		uint32_t imageHeight = image.GetHeight();
@@ -111,7 +111,7 @@ namespace Pix
 		outstream.write(buffer.str().c_str(), fileSize);
 	}
 
-	size_t ImageFile::GetExpectedFilesize(const Image& image)
+	size_t ImageFile::GetExpectedFilesize(const IImage& image)
 	{
 		return image.GetWidth() * image.GetHeight() * 3;
 	}

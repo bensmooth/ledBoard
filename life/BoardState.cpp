@@ -20,7 +20,7 @@ BoardState::~BoardState()
 {
 }
 
-void BoardState::FromImage(const Image& image, Color deadColor)
+void BoardState::FromImage(const IImage& image, Color deadColor)
 {
 	if (image.GetWidth() != GRID_WIDTH)
 	{
@@ -43,7 +43,7 @@ void BoardState::FromImage(const Image& image, Color deadColor)
 	}
 }
 
-void BoardState::ToImage(Image& image, Color deadColor, Color aliveColor)
+void BoardState::ToImage(IImage& image, Color deadColor, Color aliveColor)
 {
 	if (image.GetWidth() != GRID_WIDTH)
 	{

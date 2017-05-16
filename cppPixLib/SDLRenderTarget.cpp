@@ -22,7 +22,7 @@ namespace Pix
 	{
 	}
 
-	void SDLRenderTarget::Render(const Image& image)
+	void SDLRenderTarget::Render(const IImage& image)
 	{
 		uint32_t imageWidth = image.GetWidth();
 		uint32_t imageHeight = image.GetHeight();

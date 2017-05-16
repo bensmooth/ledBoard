@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 	{
 		IRenderTargetPtr renderTarget = IRenderTarget::GetDefaultRenderer(argv[0], LED_DIMENSION, LED_DIMENSION);
 
-		Image backbuffer(LED_DIMENSION, LED_DIMENSION);
+		ImageBuffer backbuffer(LED_DIMENSION, LED_DIMENSION);
 		FrameTimer timer(60.0);
 
 		while (true)

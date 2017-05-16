@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	Image image(18, 18);
+	ImageBuffer image(18, 18);
 	ImageFile::Read("/home/ben/code/ledBoard/images/gradient.pix", image);
 
 	ImageFile::Write(image, "out.pix");
